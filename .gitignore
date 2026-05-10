@@ -5,6 +5,7 @@ target/
 bin/
 nbbin/
 out/
+lib/
 
 # --- SPÉCIFIQUE NETBEANS (ANT & GENERAL) ---
 nbproject/private/
