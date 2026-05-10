@@ -1,8 +1,11 @@
 <project name="SAE_JAVA_2026S2" default="compile" basedir=".">
     
-    <!-- Propriétés configurables -->
     <property name="project.name" value="SAE_JAVA_2026S2"/>
     <property name="java.version" value="26"/>
+    <property name="debug.port" value="5005"/>
+    <property name="debug.timeout" value="0"/> <condition property="isWindows">
+        <os family="windows"/>
+    </condition>
     
     <property name="src.dir" value="src"/>
     <property name="build.dir" value="build"/>
@@ -23,28 +26,36 @@
     </path>
 
     <target name="clean">
-    <delete dir="${build.dir}" quiet="true" failonerror="false"/>
-    <delete dir="${dist.dir}" quiet="true" failonerror="false"/>
-</target>
+        <echo>Nettoyage des répertoires build et dist...</echo>
+        <delete dir="${build.dir}" quiet="true" failonerror="false"/>
+        <delete dir="${dist.dir}" quiet="true" failonerror="false"/>
+        <echo>Nettoyage terminé.</echo>
+    </target>
 
     <target name="init" depends="clean">
+        <echo>Initialisation des répertoires...</echo>
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${dist.dir}"/>
         <mkdir dir="${dist.lib.dir}"/>
+        <echo>Répertoires créés : ${build.dir}, ${dist.dir}, ${dist.lib.dir}</echo>
     </target>
 
     <target name="compile" depends="init">
-        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" failonerror="false">
+        <echo>Compilation des sources depuis ${src.dir} vers ${build.dir}...</echo>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" debuglevel="source,lines,vars" failonerror="false">
             <classpath refid="project.classpath"/>
         </javac>
+        <echo>Compilation terminée.</echo>
     </target>
 
     <target name="jar" depends="compile">
+        <echo>Création du JAR...</echo>
         <copy todir="${dist.lib.dir}" overwrite="true">
             <fileset dir="${lib.dir}">
                 <include name="*.jar"/>
             </fileset>
         </copy>
+        <echo>Dépendances copiées vers ${dist.lib.dir}</echo>
         <manifestclasspath property="jar.classpath" jarfile="${dist.dir}/${project.name}.jar">
             <classpath refid="dist.classpath"/>
         </manifestclasspath>
@@ -54,10 +65,49 @@
                 <attribute name="Class-Path" value="${jar.classpath}"/>
             </manifest>
         </jar>
+        <echo>JAR créé : ${dist.dir}/${project.name}.jar</echo>
     </target>
 
     <target name="run" depends="jar">
+        <echo>Lancement de l'application...</echo>
         <java jar="${dist.dir}/${project.name}.jar" fork="true"/>
+        <echo>Application lancée.</echo>
+    </target>
+
+    <target name="kill-port-windows" if="isWindows">
+        <echo>Libération du port ${debug.port} en cours (Windows)...</echo>
+        <exec executable="cmd" failonerror="false">
+            <arg value="/c"/>
+            <arg value="for /f &quot;tokens=5&quot; %a in ('netstat -a -n -o ^| findstr :${debug.port}') do taskkill /F /PID %a"/>
+        </exec>
+    </target>
+
+    <target name="kill-port-unix" unless="isWindows">
+        <echo>Libération du port ${debug.port} en cours (Unix)...</echo>
+        <exec executable="sh" failonerror="false">
+            <arg value="-c"/>
+            <arg value="lsof -t -i:${debug.port} | xargs kill -9"/>
+        </exec>
+    </target>
+
+    <target name="debug" depends="jar, kill-port-windows, kill-port-unix">
+        <echo>============================================</echo>
+        <echo>Mode DÉBOGAGE activé</echo>
+        <echo>============================================</echo>
+        <echo>Classe principale : Main</echo>
+        <echo>Port de débogage : ${debug.port}</echo>
+        <echo>Classpath : ${jar.classpath}</echo>
+        <echo></echo>
+        <echo>⚠️  IMPORTANT :</echo>
+        <echo>1. Connectez VS Code à localhost:${debug.port}</echo>
+        <echo>2. Ouvrez Run > Debug et sélectionnez 'Debug SAE_JAVA_2026S2'</echo>
+        <echo>3. La JVM attend la connexion du débogueur...</echo>
+        <echo></echo>
+        <java jar="${dist.dir}/${project.name}.jar" fork="true" failonerror="false">
+            <jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=${debug.port}"/>
+        </java>
+        <echo></echo>
+        <echo>Mode débogage terminé.</echo>
     </target>
 
 </project>

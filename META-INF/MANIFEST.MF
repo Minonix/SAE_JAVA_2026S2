@@ -3,4 +3,3 @@ Ant-Version: Apache Ant 1.10.17
 Created-By: 25.0.2+10-LTS-69 (Oracle Corporation)
 Main-Class: Main
 Class-Path: lib/gs-algo-1.3.jar lib/gs-core-1.3.jar lib/gs-ui-1.3.jar
-
