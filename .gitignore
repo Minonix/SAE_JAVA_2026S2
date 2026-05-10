@@ -4,6 +4,7 @@ dist/
 target/
 bin/
 nbbin/
+out/
 
 # --- SPÉCIFIQUE NETBEANS (ANT & GENERAL) ---
 nbproject/private/
