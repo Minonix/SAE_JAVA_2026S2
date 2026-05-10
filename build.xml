@@ -1,0 +1,59 @@
+<project name="MonProjetJava" default="compile" basedir=".">
+    
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="dist.lib.dir" value="${dist.dir}/lib"/>
+
+    <path id="project.classpath">
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="dist.classpath">
+        <fileset dir="${dist.lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+    <delete dir="${build.dir}" quiet="true" failonerror="false"/>
+    <delete dir="${dist.dir}" quiet="true" failonerror="false"/>
+</target>
+
+    <target name="init" depends="clean">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${dist.lib.dir}"/>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+            <classpath refid="project.classpath"/>
+        </javac>
+    </target>
+
+    <target name="jar" depends="compile">
+        <copy todir="${dist.lib.dir}" overwrite="true">
+            <fileset dir="${lib.dir}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <manifestclasspath property="jar.classpath" jarfile="${dist.dir}/MonApplication.jar">
+            <classpath refid="dist.classpath"/>
+        </manifestclasspath>
+        <jar destfile="${dist.dir}/MonApplication.jar" basedir="${build.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="Main"/>
+                <attribute name="Class-Path" value="${jar.classpath}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="jar">
+        <java jar="${dist.dir}/MonApplication.jar" fork="true"/>
+    </target>
+
+</project>
