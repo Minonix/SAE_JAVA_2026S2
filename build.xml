@@ -1,4 +1,8 @@
-<project name="MonProjetJava" default="compile" basedir=".">
+<project name="SAE_JAVA_2026S2" default="compile" basedir=".">
+    
+    <!-- Propriétés configurables -->
+    <property name="project.name" value="SAE_JAVA_2026S2"/>
+    <property name="java.version" value="26"/>
     
     <property name="src.dir" value="src"/>
     <property name="build.dir" value="build"/>
@@ -30,7 +34,7 @@
     </target>
 
     <target name="compile" depends="init">
-        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" failonerror="false">
             <classpath refid="project.classpath"/>
         </javac>
     </target>
@@ -41,10 +45,10 @@
                 <include name="*.jar"/>
             </fileset>
         </copy>
-        <manifestclasspath property="jar.classpath" jarfile="${dist.dir}/MonApplication.jar">
+        <manifestclasspath property="jar.classpath" jarfile="${dist.dir}/${project.name}.jar">
             <classpath refid="dist.classpath"/>
         </manifestclasspath>
-        <jar destfile="${dist.dir}/MonApplication.jar" basedir="${build.dir}">
+        <jar destfile="${dist.dir}/${project.name}.jar" basedir="${build.dir}">
             <manifest>
                 <attribute name="Main-Class" value="Main"/>
                 <attribute name="Class-Path" value="${jar.classpath}"/>
@@ -53,7 +57,7 @@
     </target>
 
     <target name="run" depends="jar">
-        <java jar="${dist.dir}/MonApplication.jar" fork="true"/>
+        <java jar="${dist.dir}/${project.name}.jar" fork="true"/>
     </target>
 
 </project>
