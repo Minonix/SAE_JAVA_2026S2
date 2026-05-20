@@ -11,7 +11,6 @@ public class Carte extends SingleGraph {
         super.addNodeCallback(centre);
     }
 
-    // TODO, plusieurs pistes possibles
     public void ajouterRoute(String nomRoute,CentreSante a, CentreSante b) {
         super.addEdge(nomRoute, a, b);
     }
