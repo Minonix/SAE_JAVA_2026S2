@@ -7,10 +7,10 @@ public class CentreSante extends SingleNode {
     private int idCentre;
     private char centerType;
 
-    CentreSante(AbstractGraph graph, String id, int id_centre, char center_type) {
+    protected CentreSante(AbstractGraph graph, String id, int idCentre, char centerType) {
         super(graph, id);
-        this.idCentre = id_centre;
-        this.centerType = center_type;
+        this.idCentre = idCentre;
+        this.centerType = centerType;
     }
 
     public int getIdCentre() {
