@@ -5,7 +5,7 @@ import org.graphstream.graph.implementations.AbstractEdge;
 public class Route extends AbstractEdge {
     private int fiabilite, distance, duree;
 
-    Route(String id, CentreSante source, CentreSante target, int fiabilite, int distance, int duree) {
+    protected Route(String id, CentreSante source, CentreSante target, int fiabilite, int distance, int duree) {
         super(id, source, target, false);
         this.fiabilite = fiabilite;
         this.distance = distance;
