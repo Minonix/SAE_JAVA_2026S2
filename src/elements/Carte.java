@@ -33,23 +33,24 @@ public class Carte extends SingleGraph {
     public static void construireGrapheAleatoire(String nomGraph,int nbSommets){
         Carte graph = new Carte(nomGraph);
 
-
         Random alea = new Random();
         int proba ;
         for (int i=0 ; i< nbSommets ; i++){
             proba = alea.nextInt(5);
             if (proba < 3){
-                graph.ajouterCentre(i, 'M');
-
+                graph.ajouterCentre("" + i, i, 'M');
                 graph.nbMat++;
             }
             else if (proba == 3){
-
+                graph.ajouterCentre("" + i, i, 'O');
+                graph.nbBloc++;
             }
             else {
-
+                graph.ajouterCentre("" + i, i, 'N');
+                graph.nbNutri++;
             }
         }
+        graph.display();
 
 
     }
