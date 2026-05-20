@@ -49,7 +49,6 @@ Thumbs.db
 # Pour Maven, les JAR sont dans le repo local (~/.m2), donc on ignore tout JAR local.
 # Si un projet Ant utilise un dossier lib/ interne, décommentez la ligne suivante :
 # !lib/*.jar
-*.jar
 *.war
 *.ear
 *.zip
