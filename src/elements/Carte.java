@@ -15,4 +15,5 @@ public class Carte extends SingleGraph {
     public void ajouterRoute(String nomRoute,CentreSante a, CentreSante b) {
         super.addEdge(nomRoute, a, b);
     }
+
 }
