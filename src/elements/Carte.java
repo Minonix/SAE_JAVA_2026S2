@@ -20,8 +20,8 @@ public class Carte extends SingleGraph {
         int nbNutri = 0;
     }
 
-    public void ajouterCentre(int idCentre, char centerType) {
-        cTmp = new CentreSante(this, Integer.toString(idCentre), idCentre, centerType);
+    public void ajouterCentre(String nomGraph, int idCentre, char centerType) {
+        cTmp = new CentreSante(this, nomGraph, idCentre, centerType);
         super.addNodeCallback(cTmp);
     }
 
