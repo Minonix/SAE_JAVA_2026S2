@@ -12,7 +12,7 @@ public class Carte extends SingleGraph {
     }
 
     // TODO, plusieurs pistes possibles
-    public void ajouterRoute() {
-
+    public void ajouterRoute(String nomRoute,CentreSante a, CentreSante b) {
+        super.addEdge(nomRoute, a, b);
     }
 }
