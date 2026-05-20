@@ -1,6 +1,8 @@
+
+import util.Parsing;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println(".(bonjoefzefezfezfur)");
-        System.out.println("kzjlfh");
+        Parsing t = new Parsing("data/graphe1.csv", null);
     }
 }
