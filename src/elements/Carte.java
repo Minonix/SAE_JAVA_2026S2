@@ -5,8 +5,8 @@ import org.graphstream.graph.implementations.SingleGraph;
 import java.util.Random;
 
 public class Carte extends SingleGraph {
-    Route rTmp;
-    CentreSante cTmp;
+    private Route rTmp;
+    private CentreSante cTmp;
 
     private int nbMat ;
     private int nbBloc ;
@@ -20,13 +20,38 @@ public class Carte extends SingleGraph {
         int nbNutri = 0;
     }
 
-    public void ajouterCentre(String nomGraph, int idCentre, char centerType) {
-        cTmp = new CentreSante(this, nomGraph, idCentre, centerType);
-        super.addNodeCallback(cTmp);
+    public int getNbMat() {
+        return nbMat;
     }
 
-    public void ajouterRoute(String nomRoute, int a, int b, int fiabilite, int distance, int duree) {
-        rTmp = new Route(nomRoute, this.getNode(Integer.toString(a)), this.getNode(Integer.toString(b)), fiabilite, distance, duree);
+    public int getNbBloc() {
+        return nbBloc;
+    }
+
+    public int getNbNutri() {
+        return nbNutri;
+    }
+
+    public int getNbTotalCentres() {
+        return nbNutri+nbBloc+nbMat;
+    }
+
+    public void ajouterCentre(String nomCentre, char centerType) {
+        cTmp = new CentreSante(this, getNbTotalCentres()+"", nomCentre, getNbTotalCentres(), centerType);
+        super.addNodeCallback(cTmp);
+        if (centerType == 'O') nbBloc++;
+        else if (centerType == 'N') nbNutri++;
+        else nbMat++;
+    }
+
+    public void ajouterRoute(int a, int b, int fiabilite, int distance, int duree) {
+        String strTmp;
+        if (a < b) {
+            strTmp = a +"-" + b;
+        } else {
+            strTmp = b +"-" + a;
+        }
+        rTmp = new Route(strTmp, this.getNode(""+a), this.getNode(""+b), fiabilite, distance, duree);
         super.addEdgeCallback(rTmp);
     }
 
@@ -38,16 +63,13 @@ public class Carte extends SingleGraph {
         for (int i=0 ; i< nbSommets ; i++){
             proba = alea.nextInt(5);
             if (proba < 3){
-                graph.ajouterCentre("" + i, i, 'M');
-                graph.nbMat++;
+                graph.ajouterCentre("" + i, 'M');
             }
             else if (proba == 3){
-                graph.ajouterCentre("" + i, i, 'O');
-                graph.nbBloc++;
+                graph.ajouterCentre("" + i, 'O');
             }
             else {
-                graph.ajouterCentre("" + i, i, 'N');
-                graph.nbNutri++;
+                graph.ajouterCentre("" + i, 'N');
             }
         }
         graph.display();

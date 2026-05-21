@@ -6,11 +6,24 @@ import org.graphstream.graph.implementations.SingleNode;
 public class CentreSante extends SingleNode {
     private int idCentre;
     private char centerType;
+    private String nomCentre;
 
-    protected CentreSante(AbstractGraph graph, String id, int idCentre, char centerType) {
+    protected CentreSante(AbstractGraph graph, String id, String nomCentre, int idCentre, char centerType) {
         super(graph, id);
+        this.nomCentre = nomCentre;
         this.idCentre = idCentre;
         this.centerType = centerType;
+        initVue();
+    }
+
+    public String getNomCentre() {
+        return nomCentre;
+    }
+
+    private void initVue() {
+        if (idCentre == 'M') {
+            this.setAttribute("ui.style", "fill-color: blue;");
+        }
     }
 
     public int getIdCentre() {
