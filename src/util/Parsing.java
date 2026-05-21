@@ -17,11 +17,14 @@ public class Parsing {
             reader = new BufferedReader(new FileReader(chemin));
 
             String line = reader.readLine();
+            String lineSplit[];
             
             this.nbLigne = 0;
             while (line != null) {
                 String trimming = line.trim();
                 if (!(trimming.startsWith("//"))) {
+                    lineSplit = trimming.split(";");
+                    //TODO: carte.ajouterCentre(lineSplit[0], lineSplit[1]);
                     this.nbLigne++;
                 }
             line = reader.readLine();
@@ -35,6 +38,7 @@ public class Parsing {
             while (line != null) {
                 String trimming = line.trim();
                 if (!(trimming.startsWith("//"))) {
+                    lineSplit = trimming.split(";");
                     //TODO: logique de parsing
                 }
             line = reader.readLine();
