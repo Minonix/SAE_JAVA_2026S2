@@ -10,6 +10,7 @@ public class Route extends AbstractEdge {
         this.fiabilite = fiabilite;
         this.distance = distance;
         this.duree = duree;
+
     }
 
     public int getFiabilite() {
