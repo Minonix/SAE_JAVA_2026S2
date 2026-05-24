@@ -55,7 +55,21 @@ public class Carte extends SingleGraph {
         super.addEdgeCallback(rTmp);
     }
 
-    public static void construireGrapheAleatoire(String nomGraph,int nbSommets){
+    public CentreSante getCentre(int i) {
+        return this.getNode(i);
+    }
+
+    public Route getRoute(int a, int b) {
+        String strTmp;
+        if (a < b) {
+            strTmp = a +"-" + b;
+        } else {
+            strTmp = b +"-" + a;
+        }
+        return this.getEdge(strTmp);
+    }
+
+    public static void construireGrapheAleatoire(String nomGraph, int nbSommets){
         Carte graph = new Carte(nomGraph);
 
         Random alea = new Random();
