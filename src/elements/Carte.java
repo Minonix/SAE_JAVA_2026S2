@@ -2,6 +2,8 @@ package elements;
 
 import org.graphstream.graph.implementations.SingleGraph;
 
+import javax.print.StreamPrintService;
+import javax.sql.rowset.spi.SyncProvider;
 import java.util.Random;
 
 public class Carte extends SingleGraph {
@@ -73,17 +75,32 @@ public class Carte extends SingleGraph {
         Carte graph = new Carte(nomGraph);
 
         Random alea = new Random();
-        int proba ;
+        int proba_centre;
+        int proba_existe;
+        int proba_fiabl;
+        int proba_dist;
+        int proba_duree;
         for (int i=0 ; i< nbSommets ; i++){
-            proba = alea.nextInt(5);
-            if (proba < 3){
+            proba_centre = alea.nextInt(5);
+            if (proba_centre < 3){
                 graph.ajouterCentre("" + i, 'M');
             }
-            else if (proba == 3){
+            else if (proba_centre == 3){
                 graph.ajouterCentre("" + i, 'O');
             }
             else {
                 graph.ajouterCentre("" + i, 'N');
+            }
+        }
+        for (int i=0; i< nbSommets; i++){
+            for (int j=i; j< nbSommets; j++){
+                proba_existe = alea.nextInt(5);
+                if (proba_existe == 0){
+                    proba_fiabl = alea.nextInt(2, 9) ;
+                    proba_dist = alea.nextInt(10,51) ;
+                    proba_duree = alea.nextInt(10,121) ;
+                    graph.ajouterRoute(i, j, proba_fiabl,proba_dist,proba_duree) ;
+                }
             }
         }
         graph.display();
