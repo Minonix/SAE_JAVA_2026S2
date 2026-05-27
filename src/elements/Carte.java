@@ -71,7 +71,7 @@ public class Carte extends SingleGraph {
         return this.getEdge(strTmp);
     }
 
-    public static void construireGrapheAleatoire(String nomGraph, int nbSommets){
+    public static Carte construireGrapheAleatoire(String nomGraph, int nbSommets){
         Carte graph = new Carte(nomGraph);
 
         Random alea = new Random();
@@ -103,5 +103,6 @@ public class Carte extends SingleGraph {
                 }
             }
         }
+        return graph ;
     }
 }
