@@ -103,9 +103,5 @@ public class Carte extends SingleGraph {
                 }
             }
         }
-        graph.display();
-
-
     }
-
 }
