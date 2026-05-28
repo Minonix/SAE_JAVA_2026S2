@@ -1,7 +1,10 @@
-package util.parsing;
+import elements.Carte;
+import util.*;
 
 public class Main {
     public static void main(String[] args) {
-        Parsing t = new Parsing("data/graphe2.csv", null);
+        Carte carte = new Carte("12");
+        Parsing t = new Parsing("data/graphe5.csv", carte);
+        carte.display();
     }
 }

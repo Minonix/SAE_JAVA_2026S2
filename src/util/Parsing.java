@@ -3,50 +3,66 @@ package util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import org.graphstream.graph.implementations.SingleGraph;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
 
+import elements.*;
+import java.io.StringReader;
+import java.util.List;
 
 public class Parsing {
     private BufferedReader reader;
     private int nbLigne;
+    Carte carte;
 
-    public Parsing(String chemin, SingleGraph carte) {
+    public Parsing(String chemin, Carte carte) {
+        this.carte = carte;
         try {
-            //dénombre le nombre de ligne
-            reader = new BufferedReader(new FileReader(chemin));
+            List<List<String>> recordsCSV = new ArrayList<List<String>>();
 
-            String line = reader.readLine();
-            String lineSplit[];
-            
-            this.nbLigne = 0;
-            while (line != null) {
-                String trimming = line.trim();
-                if (!(trimming.startsWith("//"))) {
-                    lineSplit = trimming.split(";");
-                    //TODO: carte.ajouterCentre(lineSplit[0], lineSplit[1]);
-                    this.nbLigne++;
+            CSVParser parser = new CSVParserBuilder().withSeparator(';').build();
+
+            CSVReader csvReader = new CSVReaderBuilder(new FileReader(chemin)).withCSVParser(parser).build();
+
+            String[] values =  csvReader.readNext();
+            while (values != null) {
+                if (!(values.length <= 1 || values[0].trim().startsWith("//") )) {
+                    recordsCSV.add(Arrays.asList(values));
+                    this.carte.ajouterCentre(values[0], values[1].charAt(0));
                 }
-            line = reader.readLine();
+                values = csvReader.readNext();
             }
-            reader.close();
-
-            reader = new BufferedReader(new FileReader(chemin));
-
-            line = reader.readLine();
-            
-            while (line != null) {
-                String trimming = line.trim();
-                if (!(trimming.startsWith("//"))) {
-                    lineSplit = trimming.split(";");
-                    //TODO: logique de parsing
+            nbLigne = recordsCSV.size();
+            for (int i = 0; i < nbLigne; i++) {
+                //Pour chaque ligne :
+                for (int y = 2; y < nbLigne + 1; y++) {
+                    parsingConexion(recordsCSV.get(i).get(y), i, y - 2);
                 }
-            line = reader.readLine();
             }
-            reader.close();
 
-        } catch (IOException  e) {
-            System.out.println("problem dans l'ouverture du fichier : " + e);
+        } catch (Exception e) {
+            System.out.println("l'erreur est : " + e);
+        }
+    }
+
+    private void parsingConexion(String ligne, int a, int b) {
+        try {
+            CSVReader LigneReader = new CSVReader(new StringReader(ligne));
+
+            String[] values =  LigneReader.readNext();
+                if (!(values == null || values.length <= 2)) {
+                    this.carte.ajouterRoute(a, b, Integer.parseInt(values[0]), Integer.parseInt(values[1]), Integer.parseInt(values[2]));
+                }
+                try {
+                values = LigneReader.readNext();
+                } catch(Exception e) {}
+        } catch (Exception e) {
+            System.out.println("l'erreur est : " + e);
         }
     }
 }
