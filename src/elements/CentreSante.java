@@ -21,8 +21,12 @@ public class CentreSante extends SingleNode {
     }
 
     private void initVue() {
-        if (idCentre == 'M') {
+        if (centerType == 'M') {
             this.setAttribute("ui.style", "fill-color: blue;");
+        } else if (centerType == 'O') {
+            this.setAttribute("ui.style", "fill-color: red;");
+        } else {
+            this.setAttribute("ui.style", "fill-color: green;");
         }
     }
 
