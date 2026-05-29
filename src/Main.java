@@ -1,7 +1,10 @@
-import util.GenerationAleatoire;
+import elements.Carte;
+import util.*;
 
 public class Main {
     public static void main(String[] args) {
-        GenerationAleatoire.construireGrapheAleatoire(5);
+        Carte carte = new Carte("12");
+        Parsing t = new Parsing("data/graphe5.csv", carte);
+        carte.display();
     }
 }

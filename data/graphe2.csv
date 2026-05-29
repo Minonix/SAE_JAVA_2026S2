@@ -1,8 +1,8 @@
-// Format : numero de sommet au format Si ;;;;;;5;;;;;10;;;;;15;;;;;20;;;;;25;;;;;30
-// Type de sommet (M, O ou N) ensuite repetitions :;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+// Format : numero de sommet au format Si 
+// Type de sommet (M, O ou N) ensuite repetitions :
 // Probabilite de fiabilite x10 : ex. 4 = proba de 0,4 ou 40%, si autre que zero : c'est qu'il y a un trajet vers ce sommet;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-// Distance en km,;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-// Duree moyenne en minutes;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+// Distance en km,
+// Duree moyenne en minutes;
 S1;M;0;4, 25, 50;10, 31, 37;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;5, 26, 35;0;0;0;0;0;10, 25, 35;8, 18, 23;0;0
 S2;M;4, 25, 50;0;0;9, 28, 37;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;6, 12, 24;0;0;0;0;0;0;0;0
 S3;O;10, 31, 37;0;0;10, 15, 18;6, 12, 24;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;6, 17, 24;0;0;0
