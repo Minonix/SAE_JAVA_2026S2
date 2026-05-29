@@ -2,9 +2,21 @@ package elements;
 
 import org.graphstream.graph.implementations.SingleGraph;
 
+import com.opencsv.*;
+import com.opencsv.exceptions.CsvValidationException;
+
 import javax.print.StreamPrintService;
 import javax.sql.rowset.spi.SyncProvider;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+
+
 
 public class Carte extends SingleGraph {
     private Route rTmp;
@@ -104,5 +116,57 @@ public class Carte extends SingleGraph {
             }
         }
         return graph ;
+    }
+
+    public static Carte Parsing(String id, String chemin) {
+        Carte carte = new Carte(id);
+        ArrayList<ArrayList<String>> recordsCSV = new ArrayList<>();
+
+        CSVParser parser = new CSVParserBuilder().withSeparator(';').build();
+
+        try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(chemin)).withCSVParser(parser).build()) {
+
+            String[] valeurLigne;
+            while ((valeurLigne = csvReader.readNext()) != null) {
+                if (valeurLigne.length > 1 && !valeurLigne[0].trim().startsWith("//")) {
+                    recordsCSV.add(new ArrayList<>(Arrays.asList(valeurLigne)));
+                    
+                    char idCentre = valeurLigne[1].trim().isEmpty() ? ' ' : valeurLigne[1].trim().charAt(0);
+                    carte.ajouterCentre(valeurLigne[0].trim(), idCentre);
+                }
+            }
+
+            for (int i = 0; i < recordsCSV.size(); i++) {
+                ArrayList<String> ligneCourante = recordsCSV.get(i);
+
+                for (int y = 2; y < ligneCourante.size(); y++) {
+                    String cellule = ligneCourante.get(y).trim();
+                    if (cellule.isEmpty()) continue;
+
+                    try (CSVReader ligneReader = new CSVReader(new StringReader(cellule))) {
+                        String[] valeurLien = ligneReader.readNext();
+
+                        if (valeurLien != null && valeurLien.length >= 3) {
+                            try {
+                                int proba = Integer.parseInt(valeurLien[0].trim());
+                                int distance = Integer.parseInt(valeurLien[1].trim());
+                                int duree = Integer.parseInt(valeurLien[2].trim());
+                                
+                                carte.ajouterRoute(i, y - 2, proba, distance, duree);
+                            } catch (NumberFormatException e) {
+                                System.err.println("Erreur de parsing numérique à la ligne " + i + ", colonne " + y + " : " + e.getMessage());
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Erreur de lecture du fichier : " + e.getMessage());
+        } catch (CsvValidationException e) {
+            System.err.println("Erreur de validation CSV : " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Erreur critique inattendue : " + e.getMessage());
+        }
+        return carte;
     }
 }
