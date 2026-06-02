@@ -1,9 +1,11 @@
 package elements;
 
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import com.opencsv.*;
 import com.opencsv.exceptions.CsvValidationException;
+import org.graphstream.graph.implementations.SingleNode;
 
 import javax.print.StreamPrintService;
 import javax.sql.rowset.spi.SyncProvider;
@@ -83,10 +85,51 @@ public class Carte extends SingleGraph {
         return this.getEdge(strTmp);
     }
 
+    public ArrayList<Integer> calculeItineraireDuree(CentreSante origine, CentreSante arrive){
+            ArrayList<Integer> itineraire = new ArrayList<Integer>();
+            ArrayList<Double> valuation = new ArrayList<Double>();
+
+            Route tempR ;
+
+            SingleNode current = origine ;
+            double minimum ;
+            int miniId = 0 ;
+
+            itineraire.add(origine.getIdCentre());
+
+            for (int i=0; i< this.getNbTotalCentres(); i++){
+                if (this.getCentre(i) == origine)
+                    valuation.add(0.0);
+                else
+                    valuation.add(Double.POSITIVE_INFINITY);
+            }
+            while (!current.equals(arrive)) {
+                for (Edge e : origine.getEdgeSet()) {
+                    tempR = this.getRoute(origine.getIdCentre(), Integer.parseInt(e.getId()));
+                    valuation.set(Integer.parseInt(tempR.getNode1().getId()), 0.0 + tempR.getDuree());
+
+                }
+                minimum = Double.POSITIVE_INFINITY ;
+                miniId = 0 ;
+                for (int i=0; i<valuation.size(); i++){
+                    if (minimum > valuation.get(i) && valuation.get(i) != -1){
+                        minimum = valuation.get(i) ;
+                        miniId = i ;
+                    }
+                }
+                valuation.set(miniId, -1.0);
+                itineraire.add(miniId);
+                current = this.getCentre(miniId);
+            }
+            return itineraire ;
+    }
+
+
     public static Carte construireGrapheAleatoire(String nomGraph, int nbSommets){
         Carte graph = new Carte(nomGraph);
 
         Random alea = new Random();
+        int routeForce = -1;
         int proba_centre;
         int proba_existe;
         int proba_fiabl;
@@ -105,9 +148,16 @@ public class Carte extends SingleGraph {
             }
         }
         for (int i=0; i< nbSommets; i++){
+            if (i!=0) {
+                proba_fiabl = alea.nextInt(2, 9);
+                proba_dist = alea.nextInt(10, 51);
+                proba_duree = alea.nextInt(10, 121);
+                routeForce = alea.nextInt(i);
+                graph.ajouterRoute(i, routeForce, proba_fiabl, proba_dist, proba_duree);
+            }
             for (int j=i; j< nbSommets; j++){
                 proba_existe = alea.nextInt(5);
-                if (proba_existe == 0){
+                if (proba_existe == 0 && j != routeForce){
                     proba_fiabl = alea.nextInt(2, 9) ;
                     proba_dist = alea.nextInt(10,51) ;
                     proba_duree = alea.nextInt(10,121) ;
@@ -169,4 +219,6 @@ public class Carte extends SingleGraph {
         }
         return carte;
     }
+
+
 }
