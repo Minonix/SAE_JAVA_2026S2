@@ -1,10 +1,7 @@
-import elements.Carte;
-import util.*;
+import ui.MainWindow;
 
 public class Main {
     public static void main(String[] args) {
-        Carte carte = new Carte("12");
-        Parsing t = new Parsing("data/graphe5.csv", carte);
-        carte.display();
+        new MainWindow();
     }
 }
