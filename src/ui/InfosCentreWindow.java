@@ -11,17 +11,17 @@ import java.util.ArrayList;
 
 
 public class InfosCentreWindow extends JFrame{
-    CentreSante c;
+    private CentreSante c;
 
-    ArrayList<CentreSante> centresM;
-    ArrayList<CentreSante> centresO;
-    ArrayList<CentreSante> centresN;
+    private ArrayList<CentreSante> centresM;
+    private ArrayList<CentreSante> centresO;
+    private ArrayList<CentreSante> centresN;
 
-    GridBagConstraints gc;
+    private GridBagConstraints gc;
 
-    String[] typeCentres= {"maternités", "blocs opératoires", "centres de nutritions"};
-    Color[] lstColors = {new Color(0x24283B), new Color(0x24283B), new Color(0xB4C7E7)};
-    ArrayList<ArrayList<CentreSante>> lstCentresTypes = new ArrayList<>();
+    private final String[] typeCentres= {"maternités", "blocs opératoires", "centres de nutritions"};
+    private final Color[] lstColors = {new Color(0x24283B), new Color(0x24283B), new Color(0xB4C7E7)};
+    private ArrayList<ArrayList<CentreSante>> lstCentresTypes = new ArrayList<>();
 
     private JPanel pnlMain;
     private JTabbedPane pnlCard;
@@ -43,18 +43,25 @@ public class InfosCentreWindow extends JFrame{
 
     private void initComposant() {
         pnlCard = new JTabbedPane();
-        pnlMain = new JPanel(new BorderLayout());
+        pnlMain = new JPanel(new GridBagLayout());
         gc = new GridBagConstraints();
 
         initTabs();
         initTabDistance();
         initTabDuree();
         initInfos();
+
+        GridBagConstraints gcMain = new GridBagConstraints();
+        gcMain.gridx = gcMain.gridy = 0;
+        pnlMain.add(pnlInfos, gcMain);
+        gc.gridheight = 6;
+        gcMain.gridy = 1;
+        pnlMain.add(pnlCard, gcMain);
+
         pnlCard.addTab("Plus proche", pnlPlusProches);
         pnlCard.addTab("Distances", pnlDistance);
         pnlCard.addTab("Durées", pnlDuree);
-        pnlMain.add(pnlInfos, BorderLayout.NORTH);
-        pnlMain.add(pnlCard, BorderLayout.SOUTH);
+//        pnlCard.setPreferredSize(new Dimension(200, 1000));
         this.setContentPane(pnlMain);
     }
 
@@ -69,9 +76,7 @@ public class InfosCentreWindow extends JFrame{
 
     private void initInfos() {
         pnlInfos = new JPanel(new GridBagLayout());
-        pnlInfos.setPreferredSize(new Dimension(1920, 20));
-
-        GridBagConstraints gc = new GridBagConstraints();
+        pnlInfos.setPreferredSize(new Dimension(200, 20));
 
         gc.gridy = gc.gridx = 0;
 
