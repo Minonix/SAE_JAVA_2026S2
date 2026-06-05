@@ -36,4 +36,8 @@ public class Route extends AbstractEdge {
     public void setDuree(int duree) {
         this.duree = duree;
     }
+
+    public int calculeDureeEstimee(){
+        return duree*(20-fiabilite)/10 ;
+    }
 }
