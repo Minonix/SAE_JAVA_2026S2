@@ -19,7 +19,7 @@ public class InfosCentreWindow extends JFrame{
 
     private GridBagConstraints gc;
 
-    private final String[] typeCentres= {"maternités", "blocs opératoires", "centres de nutritions"};
+    private final String[] typeCentres= {"maternité(s)", "bloc(s) opératoire(s)", "centre(s) de nutrition"};
     private final Color[] lstColors = {new Color(0x24283B), new Color(0x24283B), new Color(0xB4C7E7)};
     private ArrayList<ArrayList<CentreSante>> lstCentresTypes = new ArrayList<>();
 
@@ -92,9 +92,18 @@ public class InfosCentreWindow extends JFrame{
 
         gc.gridx = gc.gridy = 0;
 
-        pnlPlusProches.add(new JLabel("D"), gc);
+        for (int i = 0; i < 3; i++) {
+            pnlPlusProches.add(new JLabel("Plus proche "+typeCentres[i]), gc);
+            gc.gridx++;
+            pnlPlusProches.add(new JLabel("ID"), gc);
+            pnlPlusProches.add(new JLabel("Durée"), gc);
+            pnlPlusProches.add(new JLabel("Durée avec la fiabilité"));
+
+            // TODO
+        }
     }
 
+    // TODO : refaire avec Djisktra (donc pas les voisins mais tous les centres)
     private void initVoisins() {
         centresM = new ArrayList<CentreSante>();
         centresO = new ArrayList<CentreSante>();
@@ -120,6 +129,7 @@ public class InfosCentreWindow extends JFrame{
         }
     }
 
+    // TODO : refaire avec Djisktra
     private void initTabDistance() {
         pnlDistance = new JPanel(new GridBagLayout());
 
@@ -152,12 +162,17 @@ public class InfosCentreWindow extends JFrame{
 
     }
 
+    // TODO : refaire avec Djisktra
     private void initTabDuree() {
         pnlDuree = new JPanel(new GridBagLayout());
+        JLabel tmpLabel;
 
         Route r;
         for (int i = 0; i < 3; i++) {
-            pnlDuree.add(new JLabel("Durée aux " + typeCentres[i]), gc);
+            // TODO : ne marche pas pour le background, marche pour le texte ?
+            tmpLabel = new JLabel("Durée aux " + typeCentres[i]);
+            tmpLabel.setBackground(Color.ORANGE);
+            pnlDuree.add(tmpLabel, gc);
             gc.gridx++;
             pnlDuree.add(new JLabel("Id"), gc);
             gc.gridx++;
@@ -183,6 +198,4 @@ public class InfosCentreWindow extends JFrame{
         }
 
     }
-
-    // TODO : initInfos, initPlusProche, gérer le spacing dans pnlMain
 }
