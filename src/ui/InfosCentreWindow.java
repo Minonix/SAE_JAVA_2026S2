@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 public class InfosCentreWindow extends JFrame{
     private CentreSante c;
+    private Carte g;
 
     private ArrayList<CentreSante> centresM;
     private ArrayList<CentreSante> centresO;
@@ -34,6 +35,7 @@ public class InfosCentreWindow extends JFrame{
     public InfosCentreWindow(CentreSante c) {
         super("Informations sur le centre");
         this.c = c;
+        this.g = (Carte) c.getGraph();
 
         initVoisins();
         initComposant();
@@ -61,7 +63,6 @@ public class InfosCentreWindow extends JFrame{
         pnlCard.addTab("Plus proche", pnlPlusProches);
         pnlCard.addTab("Distances", pnlDistance);
         pnlCard.addTab("Durées", pnlDuree);
-//        pnlCard.setPreferredSize(new Dimension(200, 1000));
         this.setContentPane(pnlMain);
     }
 
@@ -109,9 +110,9 @@ public class InfosCentreWindow extends JFrame{
         centresO = new ArrayList<CentreSante>();
         centresN = new ArrayList<CentreSante>();
 
-        Carte carte = (Carte) c.getGraph();
+        Carte carte =  g;
         CentreSante centre;
-        for (Node node : c.getGraph().getNodeSet()) {
+        for (Node node : g.getNodeSet()) {
             centre = (CentreSante) node;
             if (carte.getRoute(centre.getIdCentre(), c.getIdCentre()) != null || carte.getRoute(c.getIdCentre(), centre.getIdCentre()) != null ) {
                 switch (centre.getCenterType()) {
@@ -147,10 +148,10 @@ public class InfosCentreWindow extends JFrame{
             for (CentreSante voisinType : lstCentresTypes.get(i)) {
                 pnlDistance.add(new JLabel(""+voisinType.getIdCentre()), gc);
                 gc.gridx++;
-                if (((Carte) c.getGraph()).getRoute(voisinType.getIdCentre(), c.getIdCentre()) != null)
-                    r = ((Carte) c.getGraph()).getRoute(voisinType.getIdCentre(), c.getIdCentre());
+                if (g.getRoute(voisinType.getIdCentre(), c.getIdCentre()) != null)
+                    r = g.getRoute(voisinType.getIdCentre(), c.getIdCentre());
                 else
-                    r = ((Carte) c.getGraph()).getRoute(c.getIdCentre(), voisinType.getIdCentre());
+                    r = g.getRoute(c.getIdCentre(), voisinType.getIdCentre());
 
                 pnlDistance.add(new JLabel("" + r.getDistance()), gc);
                 gc.gridx = 1;
@@ -184,10 +185,10 @@ public class InfosCentreWindow extends JFrame{
             for (CentreSante voisinType : lstCentresTypes.get(i)) {
                 pnlDuree.add(new JLabel(""+voisinType.getIdCentre()), gc);
                 gc.gridx++;
-                if (((Carte) c.getGraph()).getRoute(voisinType.getIdCentre(), c.getIdCentre()) != null)
-                    r = ((Carte) c.getGraph()).getRoute(voisinType.getIdCentre(), c.getIdCentre());
+                if (g.getRoute(voisinType.getIdCentre(), c.getIdCentre()) != null)
+                    r = g.getRoute(voisinType.getIdCentre(), c.getIdCentre());
                 else
-                    r = ((Carte) c.getGraph()).getRoute(c.getIdCentre(), voisinType.getIdCentre());
+                    r = g.getRoute(c.getIdCentre(), voisinType.getIdCentre());
 
                 pnlDuree.add(new JLabel("" + r.getDuree()), gc);
                 gc.gridx = 1;
