@@ -111,7 +111,6 @@ public class Carte extends SingleGraph {
             }
         }
         Dijkstra dij = djikstra(origine, "duree");
-        System.out.println(dij.getPathLength(destination));
         for (Node t : dij.getPath(destination).getNodeSet()){
             chemin.add(t.getIndex());
         }
@@ -128,7 +127,6 @@ public class Carte extends SingleGraph {
             }
         }
         Dijkstra dij = djikstra(origine, "distance");
-        System.out.println(dij.getPathLength(destination));
         for (Node t : dij.getPath(destination).getNodeSet()){
             chemin.add(t.getIndex());
         }
@@ -146,14 +144,13 @@ public class Carte extends SingleGraph {
             }
         }
         Dijkstra dij = djikstra(origine, "dureeEstimee");
-        System.out.println(dij.getPathLength(destination));
         for (Node t : dij.getPath(destination).getNodeSet()){
             chemin.add(t.getIndex());
         }
         dij.clear();
         return chemin ;
     }
-
+//L'ordre c'est duree dureeEstimé et Distance
     public  ArrayList<ArrayList<Integer>> dijkstraInfos(CentreSante origine) {
         ArrayList<ArrayList<Integer>> chemin = new  ArrayList<ArrayList<Integer>>() ;
         for (Edge edge : this.getEdgeSet()) {
@@ -162,18 +159,22 @@ public class Carte extends SingleGraph {
                 double di = (double) ((Route) edge).getDistance();
                 edge.setAttribute("duree", d);
                 edge.setAttribute("distance", di);
+                if (((Route) edge).getFiabilite() >= 0.25) {
+                    double e = (double) ((Route) edge).calculeDureeEstimee();
+                    edge.setAttribute("dureeEstimee", e);
+                }
             }
         }
         Dijkstra dijDu = djikstra(origine, "duree");
         Dijkstra dijDi = djikstra(origine, "distance");
-
-            for (Node t : this.getNodeSet()){
-                ArrayList<Integer> temp = new ArrayList<Integer>();
-                temp.add((int)dijDu.getPathLength(t));
-                temp.add((int)dijDi.getPathLength(t));
-                chemin.add(t.getIndex(), temp) ;
-
-            }
+        Dijkstra dijEs = djikstra(origine, "dureeEstimee");
+        for (Node t : this.getNodeSet()){
+            ArrayList<Integer> temp = new ArrayList<Integer>();
+            temp.add((int)dijDu.getPathLength(t));
+            temp.add((int)dijEs.getPathLength(t));
+            temp.add((int)dijDi.getPathLength(t));
+            chemin.add(t.getIndex(), temp) ;
+        }
 
         dijDu.clear();
         dijDi.clear();
@@ -182,7 +183,6 @@ public class Carte extends SingleGraph {
 
     private Dijkstra djikstra(CentreSante origine, String attibut){
         Dijkstra dij = new Dijkstra(Dijkstra.Element.EDGE, null, attibut);
-
         dij.init(this);
         dij.setSource(origine);
         dij.compute();
