@@ -1,21 +1,20 @@
 package elements;
 
+import org.graphstream.algorithm.Dijkstra;
 import org.graphstream.graph.Edge;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.Path;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import com.opencsv.*;
 import com.opencsv.exceptions.CsvValidationException;
 import org.graphstream.graph.implementations.SingleNode;
 
-import javax.print.StreamPrintService;
-import javax.sql.rowset.spi.SyncProvider;
-
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 
@@ -67,8 +66,26 @@ public class Carte extends SingleGraph {
         } else {
             strTmp = b +"-" + a;
         }
-        rTmp = new Route(strTmp, this.getNode(""+a), this.getNode(""+b), fiabilite, distance, duree);
+        CentreSante nodeA = (CentreSante) this.getNode(""+a);
+        CentreSante nodeB = (CentreSante) this.getNode(""+b);
+
+        rTmp = new Route(strTmp, nodeA, nodeB, fiabilite, distance, duree);
         super.addEdgeCallback(rTmp);
+
+        try {
+            java.lang.reflect.Method method = org.graphstream.graph.implementations.AbstractNode.class
+                    .getDeclaredMethod("addEdgeCallback", org.graphstream.graph.implementations.AbstractEdge.class);
+
+            method.setAccessible(true);
+
+            method.invoke(nodeA, rTmp);
+            method.invoke(nodeB, rTmp);
+
+        } catch (Exception e) {
+            System.err.println("Erreur de réflexion lors de l'ajout de la route : " + e.getMessage());
+        }
+
+        rTmp.setAttribute("duree", (double) duree);
     }
 
     public CentreSante getCentre(int i) {
@@ -85,45 +102,26 @@ public class Carte extends SingleGraph {
         return this.getEdge(strTmp);
     }
 
-    public ArrayList<Integer> calculeItineraireDuree(CentreSante origine, CentreSante arrive){
-            ArrayList<Integer> itineraire = new ArrayList<Integer>();
-            ArrayList<Double> valuation = new ArrayList<Double>();
-
-            Route tempR ;
-
-            SingleNode current = origine ;
-            double minimum ;
-            int miniId = 0 ;
-
-            itineraire.add(origine.getIdCentre());
-
-            for (int i=0; i< this.getNbTotalCentres(); i++){
-                if (this.getCentre(i) == origine)
-                    valuation.add(0.0);
-                else
-                    valuation.add(Double.POSITIVE_INFINITY);
+    public ArrayList<Integer> DkjistraDuree(CentreSante origine, CentreSante arrive) {
+        ArrayList<Integer> chemin = new ArrayList<Integer>() ;
+        for (Edge edge : this.getEdgeSet()) {
+            if (edge instanceof Route) {
+                double d = (double) ((Route) edge).getDuree();
+                edge.setAttribute("duree", d);
             }
-            while (!current.equals(arrive)) {
-                for (Edge e : origine.getEdgeSet()) {
-                    tempR = this.getRoute(origine.getIdCentre(), Integer.parseInt(e.getId()));
-                    valuation.set(Integer.parseInt(tempR.getNode1().getId()), 0.0 + tempR.getDuree());
+        }
+        Dijkstra dijkstra = new Dijkstra(Dijkstra.Element.EDGE, null, "duree");
 
-                }
-                minimum = Double.POSITIVE_INFINITY ;
-                miniId = 0 ;
-                for (int i=0; i<valuation.size(); i++){
-                    if (minimum > valuation.get(i) && valuation.get(i) != -1){
-                        minimum = valuation.get(i) ;
-                        miniId = i ;
-                    }
-                }
-                valuation.set(miniId, -1.0);
-                itineraire.add(miniId);
-                current = this.getCentre(miniId);
-            }
-            return itineraire ;
+        dijkstra.init(this);
+        dijkstra.setSource(origine);
+        dijkstra.compute();
+
+        for (Node t : dijkstra.getPath(arrive).getNodeSet()){
+            chemin.add(t.getIndex());
+        }
+        dijkstra.clear();
+        return chemin ;
     }
-
 
     public static Carte construireGrapheAleatoire(String nomGraph, int nbSommets){
         Carte graph = new Carte(nomGraph);
