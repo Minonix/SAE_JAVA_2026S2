@@ -102,7 +102,7 @@ public class Carte extends SingleGraph {
         return this.getEdge(strTmp);
     }
 
-    public ArrayList<Integer> DkjistraDuree(CentreSante origine, CentreSante arrive) {
+    public ArrayList<Integer> dijkstraDuree(CentreSante origine, CentreSante destination) {
         ArrayList<Integer> chemin = new ArrayList<Integer>() ;
         for (Edge edge : this.getEdgeSet()) {
             if (edge instanceof Route) {
@@ -116,7 +116,7 @@ public class Carte extends SingleGraph {
         dijkstra.setSource(origine);
         dijkstra.compute();
 
-        for (Node t : dijkstra.getPath(arrive).getNodeSet()){
+        for (Node t : dijkstra.getPath(destination).getNodeSet()){
             chemin.add(t.getIndex());
         }
         dijkstra.clear();
