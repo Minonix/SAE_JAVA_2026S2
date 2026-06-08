@@ -3,12 +3,10 @@ package elements;
 import org.graphstream.algorithm.Dijkstra;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.Path;
 import org.graphstream.graph.implementations.SingleGraph;
 
 import com.opencsv.*;
 import com.opencsv.exceptions.CsvValidationException;
-import org.graphstream.graph.implementations.SingleNode;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -102,7 +100,7 @@ public class Carte extends SingleGraph {
         return this.getEdge(strTmp);
     }
 
-    public ArrayList<Integer> DkjistraDuree(CentreSante origine, CentreSante arrive) {
+    public ArrayList<Integer> DijkstraDuree(CentreSante origine, CentreSante arrive) {
         ArrayList<Integer> chemin = new ArrayList<Integer>() ;
         for (Edge edge : this.getEdgeSet()) {
             if (edge instanceof Route) {
