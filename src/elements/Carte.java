@@ -30,9 +30,9 @@ public class Carte extends SingleGraph {
 
     public Carte(String id) {
         super(id);
-        int nbMat = 0 ;
-        int nbBloc = 0;
-        int nbNutri = 0;
+        this.nbMat = 0;
+        this.nbBloc = 0;
+        this.nbNutri = 0;
     }
 
     public int getNbMat() {
@@ -188,6 +188,8 @@ public class Carte extends SingleGraph {
                 ArrayList<String> ligneCourante = recordsCSV.get(i);
 
                 for (int y = 2; y < ligneCourante.size(); y++) {
+                    if (i >= (y - 2)) continue;
+
                     String cellule = ligneCourante.get(y).trim();
                     if (cellule.isEmpty()) continue;
 
@@ -203,7 +205,7 @@ public class Carte extends SingleGraph {
                                 carte.ajouterRoute(i, y - 2, proba, distance, duree);
                             } catch (NumberFormatException e) {
                                 System.err.println("Erreur de parsing numérique à la ligne " + i + ", colonne " + y + " : " + e.getMessage());
-                            }
+                            } 
                         }
                     }
                 }

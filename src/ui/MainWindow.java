@@ -6,11 +6,13 @@ import elements.Carte;
 import org.graphstream.ui.view.Viewer;
 
 import java.awt.*;
+import java.util.ArrayList;
+
 import javax.swing.*;
 
 public class MainWindow extends JFrame {
     // vue principale
-    JPanel plMain;
+    JPanel pnlInfoBox, pnlSelectTrajet, pnlMap, pnlStatistique, pnlBoxBtnTourne, pnlFiltre;
     Viewer vwrCarte;
     JButton btLogo;
     JComboBox<String> cbSelectCarte;
@@ -20,18 +22,27 @@ public class MainWindow extends JFrame {
     JMenuItem miImporter, miAleatoire;
     JCheckBoxMenuItem mixAfficherInfosCarte, mixAfficherRoutesDangereuses;
 
-    Carte map;
+    ArrayList<Carte> secteurs;
 
     public MainWindow() {
         super("NOM");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setPreferredSize(new Dimension(1920, 1080));
 
-        map = new Carte("5");
+        Carte map = new Carte("5");
         map.ajouterCentre("S1", 'C');
         map.ajouterCentre("S2", 'M');
         map.ajouterRoute(0, 1, 8, 12, 87);
+
+        
+        Carte map2 = Carte.Parsing("Bonjour", "data/graphe2.csv");
+        
+        secteurs = new ArrayList<>();
+        secteurs.add(map2);
+        secteurs.add(map);
+
         initComponent();
+        initListener();
 
         this.setLocationRelativeTo(null);
         this.setVisible(true);
@@ -54,12 +65,12 @@ public class MainWindow extends JFrame {
         gc.gridy = 1;
         gc.gridheight = 2;
         gc.weighty = 0.3;
-        this.getContentPane().add(initInfoBox(map.getRoute(0, 1)), gc);
+        this.getContentPane().add(initInfoBox(secteurs.get(cbSecteur.getSelectedIndex()).getRoute(0, 1)), gc);
 
         gc.gridy = 3;
         gc.gridheight = 2;
         gc.weighty = 0.3;
-        this.getContentPane().add(initSelectTrajet(map), gc);
+        this.getContentPane().add(initSelectTrajet(secteurs.get(cbSecteur.getSelectedIndex())), gc);
 
         gc.gridy = 5;
         gc.gridheight = 1;
@@ -73,12 +84,12 @@ public class MainWindow extends JFrame {
         gc.gridheight = 5;
         gc.gridwidth = 1;
         gc.weighty = 0.8;
-        this.getContentPane().add(initMap(), gc);
+        this.getContentPane().add(initMap(secteurs.get(cbSecteur.getSelectedIndex())), gc);
 
         gc.gridy = 5;
         gc.gridheight = 1;
         gc.weighty = 0.2;
-        this.getContentPane().add(initStatistique(), gc);
+        this.getContentPane().add(initStatistique(secteurs.get(cbSecteur.getSelectedIndex())), gc);
 
         this.pack();
     }
@@ -86,9 +97,12 @@ public class MainWindow extends JFrame {
     JLabel titreInfoBox, info1, info2, info3;
 
     private JPanel initInfoBox(Object select) {
-        //TODO: aspect visuel a revoir, tout et centrer en petit au centre
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(Color.LIGHT_GRAY);
+        if (pnlInfoBox == null) {
+            pnlInfoBox = new JPanel(new GridBagLayout());
+            pnlInfoBox.setBackground(Color.LIGHT_GRAY);
+        } else {
+            pnlInfoBox.removeAll();
+        }
         GridBagConstraints gc = new GridBagConstraints();
         gc.gridx = 0;
         gc.gridy = 0;
@@ -98,97 +112,196 @@ public class MainWindow extends JFrame {
                 titreInfoBox = new JLabel("Centre");
                 info1 = new JLabel("Id : " + centreSante.getIdCentre());
                 info2 = new JLabel("Nom : " + centreSante.getNomCentre());
-                
-                panel.add(titreInfoBox, gc);
+
+                pnlInfoBox.add(titreInfoBox, gc);
                 gc.gridy = 1;
-                panel.add(info1, gc);
+                pnlInfoBox.add(info1, gc);
                 gc.gridy = 2;
-                panel.add(info2, gc);
+                pnlInfoBox.add(info2, gc);
             }
             case Route route -> {
                 titreInfoBox = new JLabel("Route");
                 info1 = new JLabel("Fiabilité : " + route.getFiabilite());
                 info2 = new JLabel("Distance : " + route.getDistance());
                 info3 = new JLabel("Durée : " + route.getDuree());
-                
-                panel.add(titreInfoBox, gc);
+
+                pnlInfoBox.add(titreInfoBox, gc);
                 gc.gridy = 1;
-                panel.add(info1, gc);
+                pnlInfoBox.add(info1, gc);
                 gc.gridy = 2;
-                panel.add(info2, gc);
+                pnlInfoBox.add(info2, gc);
                 gc.gridy = 3;
-                panel.add(info3, gc);
+                pnlInfoBox.add(info3, gc);
             }
             default -> {
                 titreInfoBox = new JLabel("Aucun élément Sélectionner");
-                
-                panel.add(titreInfoBox, gc);
+
+                pnlInfoBox.add(titreInfoBox, gc);
             }
         }
 
-        return panel;
+        pnlInfoBox.revalidate();
+        pnlInfoBox.repaint();
+        return pnlInfoBox;
 
     }
 
     JLabel depLab, arrLab;
     JButton btnchercher;
-    JComboBox<String> depCB, arrCB;
+    JComboBox<String> cbDep, cbArr;
+
     private JPanel initSelectTrajet(Carte carte) {
-        //TODO: aspect visuel a revoir, tout et centrer en petit au centre
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gc = new GridBagConstraints();
-        panel.setBackground(Color.GRAY);
+        if (pnlSelectTrajet == null) {
+            pnlSelectTrajet = new JPanel(new GridBagLayout());
+            GridBagConstraints gc = new GridBagConstraints();
+            pnlSelectTrajet.setBackground(Color.GRAY);
 
-        depLab = new JLabel("Départ : ");
-        arrLab = new JLabel("Arrivée : ");
-        btnchercher = new JButton("Chercher");
-        depCB = new JComboBox<>();
-        arrCB = new JComboBox<>();
+            depLab = new JLabel("Départ : ");
+            arrLab = new JLabel("Arrivée : ");
+            btnchercher = new JButton("Chercher");
+            cbDep = new JComboBox<>();
+            cbArr = new JComboBox<>();
 
-        for (int i = 0; i < carte.getNbTotalCentres(); i++) {
-            depCB.addItem(carte.getCentre(i).getNomCentre());
-            arrCB.addItem(carte.getCentre(i).getNomCentre());
+            gc.gridx = 0;
+            gc.gridy = 0;
+            pnlSelectTrajet.add(depLab, gc);
+            gc.gridy = 1;
+            pnlSelectTrajet.add(arrLab, gc);
+            gc.gridwidth = 2;
+            gc.gridy = 2;
+            pnlSelectTrajet.add(btnchercher, gc);
+            gc.gridwidth = 1;
+            gc.gridy = 0;
+            gc.gridx = 1;
+            pnlSelectTrajet.add(cbDep, gc);
+            gc.gridy = 1;
+            pnlSelectTrajet.add(cbArr, gc);
         }
-        
-        gc.gridx = 0;
-        gc.gridy = 0;
-        panel.add(depLab, gc);
-        gc.gridy = 1;
-        panel.add(arrLab, gc);
-        gc.gridwidth = 2;
-        gc.gridy = 2;
-        panel.add(btnchercher, gc);
-        gc.gridwidth = 1;
-        gc.gridy = 0;
-        gc.gridx = 1;
-        panel.add(depCB, gc);
-        gc.gridy = 1;
-        panel.add(arrCB, gc);
 
-        return panel;
+        cbDep.removeAllItems();
+        cbArr.removeAllItems();
+        for (int i = 0; i < carte.getNbTotalCentres(); i++) {
+            cbDep.addItem(carte.getCentre(i).getNomCentre());
+            cbArr.addItem(carte.getCentre(i).getNomCentre());
+        }
+
+        return pnlSelectTrajet;
     }
 
+    JLabel lbSeuil, lbChxSecteur;
+    JTextField txSeuil;
+    JComboBox<String> cbSecteur;
     private JPanel initFiltre() {
-        JPanel panel = new JPanel();
-        panel.setBackground(Color.DARK_GRAY);
-        return panel;
+        if (pnlFiltre == null) {
+            pnlFiltre = new JPanel(new GridBagLayout());
+            pnlFiltre.setBackground(Color.DARK_GRAY);
+
+            lbSeuil = new JLabel("Seuil de dangereusité : ");
+            lbChxSecteur = new JLabel("Secteur : ");
+            txSeuil = new JTextField(20);
+            cbSecteur = new JComboBox<>();
+
+            GridBagConstraints gc = new GridBagConstraints();
+
+            gc.gridx = 0;
+            gc.gridy = 0;
+            pnlFiltre.add(lbSeuil, gc);
+            gc.gridy = 1;
+            pnlFiltre.add(lbChxSecteur, gc);
+            gc.gridx = 1;
+            pnlFiltre.add(cbSecteur, gc);
+            gc.gridy = 0;
+            pnlFiltre.add(txSeuil, gc);
+        }
+
+        cbSecteur.removeAllItems();
+        for (Carte carte : secteurs) {
+            cbSecteur.addItem(carte.toString());
+        }
+        cbSecteur.addItem("+ Ajouter un Secteur");
+
+        return pnlFiltre;
     }
+
+    JButton btTourne;
 
     private JPanel initBoxBtnTourne() {
-        JPanel panel = new JPanel();
-        panel.setBackground(Color.ORANGE);
-        return panel;
+        pnlBoxBtnTourne = new JPanel(new BorderLayout());
+
+        pnlBoxBtnTourne.setBackground(Color.ORANGE);
+
+        btTourne = new JButton("Créer une Tournée");
+
+        pnlBoxBtnTourne.add(btTourne, BorderLayout.CENTER);
+
+        return pnlBoxBtnTourne;
     }
 
-    private JPanel initMap() {
-        JPanel panel = new JPanel();
-        panel.setBackground(Color.WHITE);
-        return panel;
+    private JPanel initMap(Carte map) {
+        if (pnlMap == null) {
+            pnlMap = new JPanel(new BorderLayout());
+            pnlMap.setBackground(Color.WHITE);
+        } else {
+            pnlMap.removeAll();
+            if (vwrCarte != null) {
+                vwrCarte.close();
+            }
+        }
+
+        vwrCarte = new Viewer(map, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+
+        vwrCarte.enableAutoLayout();
+
+        Component view = (Component) vwrCarte.addDefaultView(false);
+        pnlMap.add(view, BorderLayout.CENTER);
+        pnlMap.revalidate();
+        pnlMap.repaint();
+
+        return pnlMap;
     }
 
-    private JPanel initStatistique() {
-        JPanel panel = new JPanel();
-        panel.setBackground(Color.CYAN);
-        return panel;
+    JLabel lbNbCentre, lbNbMaternitee, lbNbOperatoire;
+
+    private JPanel initStatistique(Carte map) {
+        if (pnlStatistique == null) {
+            pnlStatistique = new JPanel(new BorderLayout(100, 10));
+            pnlStatistique.setBackground(Color.CYAN);
+
+            lbNbCentre = new JLabel();
+            lbNbMaternitee = new JLabel();
+            lbNbOperatoire = new JLabel();
+
+            pnlStatistique.add(lbNbCentre, BorderLayout.WEST);
+            pnlStatistique.add(lbNbMaternitee, BorderLayout.CENTER);
+            pnlStatistique.add(lbNbOperatoire, BorderLayout.EAST);
+        }
+        
+        lbNbCentre.setText("Centres de Nutrition : " + map.getNbNutri());
+        lbNbMaternitee.setText("Maternités : " + map.getNbMat());
+        lbNbOperatoire.setText("Blocs Opératoires : " + map.getNbBloc());
+
+        return pnlStatistique;
+    }
+
+    private void initListener() {
+        cbSecteur.addActionListener((e) -> {
+            if (((JComboBox)e.getSource()).getSelectedIndex() == ((JComboBox)e.getSource()).getItemCount() - 1) {
+                //TODO: ouverture d'une fenetre pour les details de la nouvelle carte + ajout dans la liste
+                Carte nouvelleCarte = Carte.construireGrapheAleatoire("test", 10);
+                secteurs.add(nouvelleCarte);
+                
+                cbSecteur.insertItemAt(nouvelleCarte.toString(), cbSecteur.getItemCount() - 1);
+                
+                cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
+            }
+            Carte mapSelectionnee = secteurs.get(cbSecteur.getSelectedIndex());
+            initMap(mapSelectionnee);
+            initStatistique(mapSelectionnee);
+            
+            // TODO: a changer, soit au clique de l'user soit par default
+            initInfoBox(mapSelectionnee.getNbTotalCentres() > 0 ? mapSelectionnee.getCentre(0) : null);
+            initSelectTrajet(mapSelectionnee);
+            System.out.println("test");
+        });
     }
 }
