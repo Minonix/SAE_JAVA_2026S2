@@ -8,6 +8,7 @@ import org.graphstream.graph.implementations.SingleGraph;
 
 import com.opencsv.*;
 import com.opencsv.exceptions.CsvValidationException;
+import java.io.FileNotFoundException;
 import org.graphstream.graph.implementations.SingleNode;
 
 import java.io.FileReader;
@@ -233,7 +234,7 @@ public class Carte extends SingleGraph {
         return graph ;
     }
 
-    public static Carte Parsing(String id, String chemin) {
+    public static Carte Parsing(String id, String chemin) throws FileNotFoundException{
         Carte carte = new Carte(id);
         ArrayList<ArrayList<String>> recordsCSV = new ArrayList<>();
 
@@ -279,6 +280,7 @@ public class Carte extends SingleGraph {
             }
         } catch (IOException e) {
             System.err.println("Erreur de lecture du fichier : " + e.getMessage());
+            throw new FileNotFoundException();
         } catch (CsvValidationException e) {
             System.err.println("Erreur de validation CSV : " + e.getMessage());
         } catch (Exception e) {
