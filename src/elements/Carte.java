@@ -110,17 +110,84 @@ public class Carte extends SingleGraph {
                 edge.setAttribute("duree", d);
             }
         }
-        Dijkstra dijkstra = new Dijkstra(Dijkstra.Element.EDGE, null, "duree");
-
-        dijkstra.init(this);
-        dijkstra.setSource(origine);
-        dijkstra.compute();
-
-        for (Node t : dijkstra.getPath(destination).getNodeSet()){
+        Dijkstra dij = djikstra(origine, "duree");
+        for (Node t : dij.getPath(destination).getNodeSet()){
             chemin.add(t.getIndex());
         }
-        dijkstra.clear();
+        dij.clear();
         return chemin ;
+    }
+
+    public ArrayList<Integer> dijkstraDistance(CentreSante origine, CentreSante destination) {
+        ArrayList<Integer> chemin = new ArrayList<Integer>() ;
+        for (Edge edge : this.getEdgeSet()) {
+            if (edge instanceof Route) {
+                double d = (double) ((Route) edge).getDistance();
+                edge.setAttribute("distance", d);
+            }
+        }
+        Dijkstra dij = djikstra(origine, "distance");
+        for (Node t : dij.getPath(destination).getNodeSet()){
+            chemin.add(t.getIndex());
+        }
+        dij.clear();
+        return chemin ;
+    }
+    public ArrayList<Integer> dijkstraEstimation(CentreSante origine, CentreSante destination) {
+        ArrayList<Integer> chemin = new ArrayList<Integer>() ;
+        for (Edge edge : this.getEdgeSet()) {
+            if (edge instanceof Route) {
+                if (((Route) edge).getFiabilite() >= 0.25) {
+                    double d = (double) ((Route) edge).calculeDureeEstimee();
+                    edge.setAttribute("dureeEstimee", d);
+                }
+            }
+        }
+        Dijkstra dij = djikstra(origine, "dureeEstimee");
+        for (Node t : dij.getPath(destination).getNodeSet()){
+            chemin.add(t.getIndex());
+        }
+        dij.clear();
+        return chemin ;
+    }
+//L'ordre c'est duree dureeEstimé et Distance
+    public  ArrayList<ArrayList<Integer>> dijkstraInfos(CentreSante origine) {
+        ArrayList<ArrayList<Integer>> chemin = new  ArrayList<ArrayList<Integer>>() ;
+        for (Edge edge : this.getEdgeSet()) {
+            if (edge instanceof Route) {
+                double d = (double) ((Route) edge).getDuree();
+                double di = (double) ((Route) edge).getDistance();
+                edge.setAttribute("duree", d);
+                edge.setAttribute("distance", di);
+                if (((Route) edge).getFiabilite() >= 0.25) {
+                    double e = (double) ((Route) edge).calculeDureeEstimee();
+                    edge.setAttribute("dureeEstimee", e);
+                }
+            }
+        }
+        Dijkstra dijDu = djikstra(origine, "duree");
+        Dijkstra dijDi = djikstra(origine, "distance");
+        Dijkstra dijEs = djikstra(origine, "dureeEstimee");
+
+        for (Node t : this.getNodeSet()){
+            ArrayList<Integer> temp = new ArrayList<Integer>();
+            temp.add((int)dijDu.getPathLength(t));
+            temp.add((int)dijEs.getPathLength(t));
+            temp.add((int)dijDi.getPathLength(t));
+            chemin.add(t.getIndex(), temp) ;
+        }
+
+        dijDu.clear();
+        dijDi.clear();
+        return chemin ;
+    }
+
+    private Dijkstra djikstra(CentreSante origine, String attibut){
+        Dijkstra dij = new Dijkstra(Dijkstra.Element.EDGE, null, attibut);
+        dij.init(this);
+        dij.setSource(origine);
+        dij.compute();
+        return dij ;
     }
 
     public static Carte construireGrapheAleatoire(String nomGraph, int nbSommets){
