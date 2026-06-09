@@ -2,7 +2,6 @@ package ui;
 
 import elements.Carte;
 import elements.CentreSante;
-import elements.Route;
 import org.graphstream.graph.Node;
 
 import javax.swing.*;
@@ -13,6 +12,8 @@ import java.util.ArrayList;
 public class InfosCentreWindow extends JFrame{
     private CentreSante c;
     private Carte g;
+
+    public ArrayList<ArrayList<Integer>> allData;
 
     private ArrayList<CentreSante> centresM;
     private ArrayList<CentreSante> centresO;
@@ -37,7 +38,9 @@ public class InfosCentreWindow extends JFrame{
         this.c = c;
         this.g = (Carte) c.getGraph();
 
-        initVoisins();
+        allData = g.dijkstraInfos(c);
+
+        initCentres();
         initComposant();
         this.pack();
         this.setVisible(true);
@@ -52,6 +55,7 @@ public class InfosCentreWindow extends JFrame{
         initTabDistance();
         initTabDuree();
         initInfos();
+        initPlusProches();
 
         GridBagConstraints gcMain = new GridBagConstraints();
         gcMain.gridx = gcMain.gridy = 0;
@@ -60,9 +64,15 @@ public class InfosCentreWindow extends JFrame{
         gcMain.gridy = 1;
         pnlMain.add(pnlCard, gcMain);
 
-        pnlCard.addTab("Plus proche", pnlPlusProches);
-        pnlCard.addTab("Distances", pnlDistance);
-        pnlCard.addTab("Durées", pnlDuree);
+//        pnlCard.addTab("Plus proche", pnlPlusProches);
+
+        pnlCard.setPreferredSize(new Dimension(450, 200));
+
+        pnlCard.addTab("Plus proche", new JScrollPane(pnlPlusProches));
+        pnlCard.addTab("Distances", new JScrollPane(pnlDistance));
+        pnlCard.addTab("Durées", new JScrollPane(pnlDuree));
+
+
         this.setContentPane(pnlMain);
     }
 
@@ -90,22 +100,42 @@ public class InfosCentreWindow extends JFrame{
 
     private void initPlusProches() {
         pnlPlusProches = new JPanel(new GridBagLayout());
+        ArrayList<ArrayList<CentreSante>> lsts = new ArrayList<>();
+        lsts.add(centresM);
+        lsts.add(centresO);
+        lsts.add(centresN);
 
-        gc.gridx = gc.gridy = 0;
+        CentreSante tmp;
+
+        gc.gridy = 0;
 
         for (int i = 0; i < 3; i++) {
+            gc.gridx = 0;
             pnlPlusProches.add(new JLabel("Plus proche "+typeCentres[i]), gc);
             gc.gridx++;
             pnlPlusProches.add(new JLabel("ID"), gc);
+            gc.gridx++;
             pnlPlusProches.add(new JLabel("Durée"), gc);
-            pnlPlusProches.add(new JLabel("Durée avec la fiabilité"));
+            gc.gridx++;
+            pnlPlusProches.add(new JLabel("Durée avec la fiabilité"), gc);
 
-            // TODO
+            gc.gridy++;
+
+            gc.gridx = 1;
+
+            tmp = plusProcheCentre(lsts.get(i));
+            pnlPlusProches.add(new JLabel(""+tmp.getIdCentre()), gc);
+            gc.gridx++;
+            pnlPlusProches.add(new JLabel(""+allData.get(tmp.getIdCentre()).get(0)), gc);
+            gc.gridx++;
+            pnlPlusProches.add(new JLabel(""+allData.get(tmp.getIdCentre()).get(1)), gc);
+
+            gc.gridy++;
+
         }
     }
 
-    // TODO : refaire avec Djisktra (donc pas les voisins mais tous les centres)
-    private void initVoisins() {
+    private void initCentres() {
         centresM = new ArrayList<CentreSante>();
         centresO = new ArrayList<CentreSante>();
         centresN = new ArrayList<CentreSante>();
@@ -114,7 +144,7 @@ public class InfosCentreWindow extends JFrame{
         CentreSante centre;
         for (Node node : g.getNodeSet()) {
             centre = (CentreSante) node;
-            if (carte.getRoute(centre.getIdCentre(), c.getIdCentre()) != null || carte.getRoute(c.getIdCentre(), centre.getIdCentre()) != null ) {
+            if (centre != c) {
                 switch (centre.getCenterType()) {
                     case 'M':
                         centresM.add(centre);
@@ -130,11 +160,11 @@ public class InfosCentreWindow extends JFrame{
         }
     }
 
-    // TODO : refaire avec Djisktra
+    // TODO : Fusionner initTabDistance et initTabDuree en modulaire
+
     private void initTabDistance() {
         pnlDistance = new JPanel(new GridBagLayout());
 
-        Route r;
         for (int i = 0; i < 3; i++) {
             pnlDistance.add(new JLabel("Distance aux " + typeCentres[i]), gc);
             gc.gridx++;
@@ -145,15 +175,11 @@ public class InfosCentreWindow extends JFrame{
             gc.gridy++;
             gc.gridx = 1;
 
-            for (CentreSante voisinType : lstCentresTypes.get(i)) {
-                pnlDistance.add(new JLabel(""+voisinType.getIdCentre()), gc);
+            for (CentreSante centreType : lstCentresTypes.get(i)) {
+                pnlDistance.add(new JLabel(""+centreType.getIdCentre()), gc);
                 gc.gridx++;
-                if (g.getRoute(voisinType.getIdCentre(), c.getIdCentre()) != null)
-                    r = g.getRoute(voisinType.getIdCentre(), c.getIdCentre());
-                else
-                    r = g.getRoute(c.getIdCentre(), voisinType.getIdCentre());
 
-                pnlDistance.add(new JLabel("" + r.getDistance()), gc);
+                pnlDistance.add(new JLabel("" + allData.get(centreType.getIdCentre()).get(2)), gc);
                 gc.gridx = 1;
                 gc.gridy++;
             }
@@ -163,12 +189,10 @@ public class InfosCentreWindow extends JFrame{
 
     }
 
-    // TODO : refaire avec Djisktra
     private void initTabDuree() {
         pnlDuree = new JPanel(new GridBagLayout());
         JLabel tmpLabel;
 
-        Route r;
         for (int i = 0; i < 3; i++) {
             // TODO : ne marche pas pour le background, marche pour le texte ?
             tmpLabel = new JLabel("Durée aux " + typeCentres[i]);
@@ -182,21 +206,31 @@ public class InfosCentreWindow extends JFrame{
             gc.gridy++;
             gc.gridx = 1;
 
-            for (CentreSante voisinType : lstCentresTypes.get(i)) {
-                pnlDuree.add(new JLabel(""+voisinType.getIdCentre()), gc);
+            for (CentreSante centreType : lstCentresTypes.get(i)) {
+                pnlDuree.add(new JLabel(""+centreType.getIdCentre()), gc);
                 gc.gridx++;
-                if (g.getRoute(voisinType.getIdCentre(), c.getIdCentre()) != null)
-                    r = g.getRoute(voisinType.getIdCentre(), c.getIdCentre());
-                else
-                    r = g.getRoute(c.getIdCentre(), voisinType.getIdCentre());
 
-                pnlDuree.add(new JLabel("" + r.getDuree()), gc);
+                pnlDuree.add(new JLabel("" + allData.get(centreType.getIdCentre()).get(0)), gc);
                 gc.gridx = 1;
                 gc.gridy++;
             }
+
             gc.gridx = 0;
             gc.gridy++;
         }
 
+    }
+
+    private CentreSante plusProcheCentre(ArrayList<CentreSante> liste) {
+        CentreSante res = liste.get(0);
+        int dureeEstimeeMax = allData.get(res.getIdCentre()).get(1);
+
+        for (CentreSante centre : liste) {
+            if (allData.get(centre.getIdCentre()).get(1) < dureeEstimeeMax) {
+                dureeEstimeeMax = allData.get(centre.getIdCentre()).get(1);
+                res = centre;
+            }
+        }
+        return res;
     }
 }
