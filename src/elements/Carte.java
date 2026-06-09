@@ -213,11 +213,11 @@ public class Carte extends SingleGraph {
             }
         }
         for (int i=0; i< nbSommets; i++){
-            if (i!=0) {
+            if (i!=nbSommets-1) {
                 proba_fiabl = alea.nextInt(2, 9);
                 proba_dist = alea.nextInt(10, 51);
                 proba_duree = alea.nextInt(10, 121);
-                routeForce = alea.nextInt(i);
+                routeForce = alea.nextInt(i+1, nbSommets);
                 graph.ajouterRoute(i, routeForce, proba_fiabl, proba_dist, proba_duree);
             }
             for (int j=i; j< nbSommets; j++){
