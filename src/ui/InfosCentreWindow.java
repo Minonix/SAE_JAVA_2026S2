@@ -10,8 +10,8 @@ import java.util.ArrayList;
 
 
 public class InfosCentreWindow extends JFrame{
-    private CentreSante c;
-    private Carte g;
+    private final CentreSante c;
+    private final Carte g;
 
     public ArrayList<ArrayList<Integer>> allData;
 
@@ -22,11 +22,7 @@ public class InfosCentreWindow extends JFrame{
     private GridBagConstraints gc;
 
     private final String[] typeCentres= {"maternité(s)", "bloc(s) opératoire(s)", "centre(s) de nutrition"};
-    private final Color[] lstColors = {new Color(0x24283B), new Color(0x24283B), new Color(0xB4C7E7)};
-    private ArrayList<ArrayList<CentreSante>> lstCentresTypes = new ArrayList<>();
-
-    private JPanel pnlMain;
-    private JTabbedPane pnlCard;
+    private final ArrayList<ArrayList<CentreSante>> lstCentresTypes = new ArrayList<>();
 
     private JPanel pnlInfos;
     private JPanel pnlPlusProches;
@@ -47,8 +43,8 @@ public class InfosCentreWindow extends JFrame{
     }
 
     private void initComposant() {
-        pnlCard = new JTabbedPane();
-        pnlMain = new JPanel(new GridBagLayout());
+        JTabbedPane pnlCard = new JTabbedPane();
+        JPanel pnlMain = new JPanel(new GridBagLayout());
         gc = new GridBagConstraints();
 
         initTabs();
@@ -93,9 +89,9 @@ public class InfosCentreWindow extends JFrame{
 
         pnlInfos.add(new JLabel("Nom : "+c.getNomCentre()), gc);
         gc.gridx++;
-        pnlInfos.add(new JLabel("ID : " + c.getIdCentre()+""), gc);
+        pnlInfos.add(new JLabel("ID : " + c.getIdCentre()), gc);
         gc.gridx++;
-        pnlInfos.add(new JLabel("Type : "+c.getCenterType()+""), gc);
+        pnlInfos.add(new JLabel("Type : "+c.getCenterType()), gc);
     }
 
     private void initPlusProches() {
@@ -136,11 +132,10 @@ public class InfosCentreWindow extends JFrame{
     }
 
     private void initCentres() {
-        centresM = new ArrayList<CentreSante>();
-        centresO = new ArrayList<CentreSante>();
-        centresN = new ArrayList<CentreSante>();
+        centresM = new ArrayList<>();
+        centresO = new ArrayList<>();
+        centresN = new ArrayList<>();
 
-        Carte carte =  g;
         CentreSante centre;
         for (Node node : g.getNodeSet()) {
             centre = (CentreSante) node;
@@ -210,7 +205,7 @@ public class InfosCentreWindow extends JFrame{
                 pnlDuree.add(new JLabel(""+centreType.getIdCentre()), gc);
                 gc.gridx++;
 
-                pnlDuree.add(new JLabel("" + allData.get(centreType.getIdCentre()).get(0)), gc);
+                pnlDuree.add(new JLabel("" + allData.get(centreType.getIdCentre()).getFirst()), gc);
                 gc.gridx = 1;
                 gc.gridy++;
             }
@@ -222,7 +217,7 @@ public class InfosCentreWindow extends JFrame{
     }
 
     private CentreSante plusProcheCentre(ArrayList<CentreSante> liste) {
-        CentreSante res = liste.get(0);
+        CentreSante res = liste.getFirst();
         int dureeEstimeeMax = allData.get(res.getIdCentre()).get(1);
 
         for (CentreSante centre : liste) {
