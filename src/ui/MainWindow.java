@@ -7,6 +7,7 @@ import org.graphstream.ui.view.Viewer;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.io.FileNotFoundException;
 
 import javax.swing.*;
 
@@ -34,8 +35,13 @@ public class MainWindow extends JFrame {
         map.ajouterCentre("S2", 'M');
         map.ajouterRoute(0, 1, 8, 12, 87);
 
-        
-        Carte map2 = Carte.Parsing("Bonjour", "data/graphe2.csv");
+        Carte map2;
+        try {
+            map2 = Carte.Parsing("Bonjour", "data/graphe2.csv");
+        } catch (FileNotFoundException e) {
+            System.err.println("Fichier introuvable : data/graphe2.csv");
+            map2 = new Carte("Bonjour"); // On crée une carte vide en secours pour éviter un crash
+        }
         
         secteurs = new ArrayList<>();
         secteurs.add(map2);
@@ -287,10 +293,10 @@ public class MainWindow extends JFrame {
         cbSecteur.addActionListener((e) -> {
             if (((JComboBox)e.getSource()).getSelectedIndex() == ((JComboBox)e.getSource()).getItemCount() - 1) {
                 //TODO: ouverture d'une fenetre pour les details de la nouvelle carte + ajout dans la liste
-                Carte nouvelleCarte = Carte.construireGrapheAleatoire("test", 10);
-                secteurs.add(nouvelleCarte);
+                Carte nCarte = NewSecteurWindow.NewSecteur();
                 
-                cbSecteur.insertItemAt(nouvelleCarte.toString(), cbSecteur.getItemCount() - 1);
+                secteurs.add(nCarte);
+                cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
                 
                 cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
             }
