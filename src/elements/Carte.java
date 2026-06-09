@@ -168,6 +168,7 @@ public class Carte extends SingleGraph {
         Dijkstra dijDu = djikstra(origine, "duree");
         Dijkstra dijDi = djikstra(origine, "distance");
         Dijkstra dijEs = djikstra(origine, "dureeEstimee");
+
         for (Node t : this.getNodeSet()){
             ArrayList<Integer> temp = new ArrayList<Integer>();
             temp.add((int)dijDu.getPathLength(t));
