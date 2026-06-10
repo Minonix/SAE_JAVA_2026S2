@@ -33,6 +33,7 @@ public class Carte extends SingleGraph {
         int nbMat = 0 ;
         int nbBloc = 0;
         int nbNutri = 0;
+        this.setAttribute("ui.stylesheet","url('./assets/style/style.css')");
     }
 
     public int getNbMat() {

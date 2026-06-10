@@ -1,0 +1,11 @@
+node {
+    shape: diamond;
+    size: 20px;
+}
+
+edge {
+    shape: cubic-curve;
+    stroke-width: 4px;
+    stroke-mode: plain;
+    stroke-color: black;
+}
