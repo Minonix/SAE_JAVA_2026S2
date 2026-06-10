@@ -8,7 +8,6 @@ import org.graphstream.graph.implementations.SingleGraph;
 
 import com.opencsv.*;
 import com.opencsv.exceptions.CsvValidationException;
-import org.graphstream.graph.implementations.SingleNode;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -268,5 +267,28 @@ public class Carte extends SingleGraph {
         return carte;
     }
 
+    public void switchAffNoms() {
+        CentreSante c;
+        for (Node n : this) {
+            c = (CentreSante) n;
+            c.switchAffNomCentre();
+        }
+    }
+
+    public void switchAffIDs() {
+        CentreSante c;
+        for (Node n : this) {
+            c = (CentreSante) n;
+            c.switchAffIdCentre();
+        }
+    }
+
+    public void switchAffTypes() {
+        CentreSante c;
+        for (Node n : this) {
+            c = (CentreSante) n;
+            c.switchAffCenterType();
+        }
+    }
 
 }
