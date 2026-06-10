@@ -291,4 +291,10 @@ public class Carte extends SingleGraph {
         }
     }
 
+    public void resetCouleursRoutes() {
+        for (Edge e : this.getEdgeSet()) {
+            e.setAttribute("ui.style", "fill-color: black;");
+        }
+    }
+
 }
