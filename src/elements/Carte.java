@@ -102,8 +102,8 @@ public class Carte extends SingleGraph {
         return this.getEdge(strTmp);
     }
 
-    public ArrayList<Integer> dijkstraDuree(CentreSante origine, CentreSante destination) {
-        ArrayList<Integer> chemin = new ArrayList<Integer>() ;
+    public Path dijkstraDuree(CentreSante origine, CentreSante destination) {
+        Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
             if (edge instanceof Route) {
                 double d = (double) ((Route) edge).getDuree();
@@ -111,15 +111,13 @@ public class Carte extends SingleGraph {
             }
         }
         Dijkstra dij = djikstra(origine, "duree");
-        for (Node t : dij.getPath(destination).getNodeSet()){
-            chemin.add(t.getIndex());
-        }
+        chemin = dij.getPath(destination) ;
         dij.clear();
         return chemin ;
     }
 
-    public ArrayList<Integer> dijkstraDistance(CentreSante origine, CentreSante destination) {
-        ArrayList<Integer> chemin = new ArrayList<Integer>() ;
+    public Path dijkstraDistance(CentreSante origine, CentreSante destination) {
+        Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
             if (edge instanceof Route) {
                 double d = (double) ((Route) edge).getDistance();
@@ -127,14 +125,12 @@ public class Carte extends SingleGraph {
             }
         }
         Dijkstra dij = djikstra(origine, "distance");
-        for (Node t : dij.getPath(destination).getNodeSet()){
-            chemin.add(t.getIndex());
-        }
+        chemin = dij.getPath(destination) ;
         dij.clear();
         return chemin ;
     }
-    public ArrayList<Integer> dijkstraEstimation(CentreSante origine, CentreSante destination) {
-        ArrayList<Integer> chemin = new ArrayList<Integer>() ;
+    public Path dijkstraEstimation(CentreSante origine, CentreSante destination) {
+        Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
             if (edge instanceof Route) {
                 if (((Route) edge).getFiabilite() >= 0.25) {
@@ -144,13 +140,11 @@ public class Carte extends SingleGraph {
             }
         }
         Dijkstra dij = djikstra(origine, "dureeEstimee");
-        for (Node t : dij.getPath(destination).getNodeSet()){
-            chemin.add(t.getIndex());
-        }
+        chemin = dij.getPath(destination) ;
         dij.clear();
         return chemin ;
     }
-//L'ordre c'est duree dureeEstimé et Distance
+//L'ordre est : duree | dureeEstimé | Distance
     public  ArrayList<ArrayList<Integer>> dijkstraInfos(CentreSante origine) {
         ArrayList<ArrayList<Integer>> chemin = new  ArrayList<ArrayList<Integer>>() ;
         for (Edge edge : this.getEdgeSet()) {
