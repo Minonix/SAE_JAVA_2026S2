@@ -153,7 +153,7 @@ public class MainWindow extends JFrame {
     }
 
     JLabel depLab, arrLab;
-    JButton btnchercher;
+    JButton btnchercherDuree, btnchercherEstimation;
     JComboBox<String> cbDep, cbArr;
 
     private JPanel initSelectTrajet(Carte carte) {
@@ -164,7 +164,8 @@ public class MainWindow extends JFrame {
 
             depLab = new JLabel("Départ : ");
             arrLab = new JLabel("Arrivée : ");
-            btnchercher = new JButton("Chercher");
+            btnchercherDuree = new JButton("Le plus rapide");
+            btnchercherEstimation = new JButton("L'entre deux"); //TODO: a changé le nom
             cbDep = new JComboBox<>();
             cbArr = new JComboBox<>();
 
@@ -173,15 +174,15 @@ public class MainWindow extends JFrame {
             pnlSelectTrajet.add(depLab, gc);
             gc.gridy = 1;
             pnlSelectTrajet.add(arrLab, gc);
-            gc.gridwidth = 2;
             gc.gridy = 2;
-            pnlSelectTrajet.add(btnchercher, gc);
-            gc.gridwidth = 1;
+            pnlSelectTrajet.add(btnchercherDuree, gc);
             gc.gridy = 0;
             gc.gridx = 1;
             pnlSelectTrajet.add(cbDep, gc);
             gc.gridy = 1;
             pnlSelectTrajet.add(cbArr, gc);
+            gc.gridy = 2;
+            pnlSelectTrajet.add(btnchercherEstimation, gc);
         }
 
         cbDep.removeAllItems();
@@ -292,12 +293,12 @@ public class MainWindow extends JFrame {
     private void initListener() {
         cbSecteur.addActionListener((e) -> {
             if (((JComboBox)e.getSource()).getSelectedIndex() == ((JComboBox)e.getSource()).getItemCount() - 1) {
-                //TODO: ouverture d'une fenetre pour les details de la nouvelle carte + ajout dans la liste
                 Carte nCarte = NewSecteurWindow.NewSecteur();
-                
-                secteurs.add(nCarte);
-                cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
-                
+                if (nCarte != null) {
+                    secteurs.add(nCarte);
+                    cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
+                    
+                }
                 cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
             }
             Carte mapSelectionnee = secteurs.get(cbSecteur.getSelectedIndex());
@@ -305,9 +306,16 @@ public class MainWindow extends JFrame {
             initStatistique(mapSelectionnee);
             
             // TODO: a changer, soit au clique de l'user soit par default
-            initInfoBox(mapSelectionnee.getNbTotalCentres() > 0 ? mapSelectionnee.getCentre(0) : null);
+            initInfoBox(mapSelectionnee.getNbTotalCentres() > 1 ? mapSelectionnee.getRoute(0, 1) : null);
             initSelectTrajet(mapSelectionnee);
-            System.out.println("test");
+        });
+    
+        btnchercherDuree.addActionListener((e) -> {
+            Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+            if (cbDep.getSelectedItem() != cbArr.getSelectedItem()) {
+                //TODO: prendre la sortie pour utiliser sur la coloration
+                System.out.println(mapSelcetione.dijkstraDuree(mapSelcetione.getCentre(cbDep.getSelectedIndex()), mapSelcetione.getCentre(cbArr.getSelectedIndex())).toString());
+            }
         });
     }
 }
