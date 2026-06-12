@@ -95,6 +95,10 @@ public class Carte extends SingleGraph {
         return this.getNode(i);
     }
 
+    public CentreSante getCentre(String id) {
+        return this.getNode(id);
+    }
+
     public Route getRoute(int a, int b) {
         String strTmp;
         if (a < b) {

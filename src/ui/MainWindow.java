@@ -3,14 +3,25 @@ package ui;
 import elements.CentreSante;
 import elements.Route;
 import elements.Carte;
+
+import org.graphstream.ui.graphicGraph.GraphicElement;
+// import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.view.Viewer;
+// import org.graphstream.ui.view.util.InteractiveElement;
+// import org.graphstream.graph.Node;
+// import org.graphstream.graph.Edge;
+import java.util.EnumSet;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.io.FileNotFoundException;
 
 import javax.swing.*;
-
+import javax.swing.text.View;
 public class MainWindow extends JFrame {
     // vue principale
     JPanel pnlInfoBox, pnlSelectTrajet, pnlMap, pnlStatistique, pnlBoxBtnTourne, pnlFiltre;
@@ -113,36 +124,42 @@ public class MainWindow extends JFrame {
         gc.gridx = 0;
         gc.gridy = 0;
 
-        switch (select) {
-            case CentreSante centreSante -> {
-                titreInfoBox = new JLabel("Centre");
-                info1 = new JLabel("Id : " + centreSante.getIdCentre());
-                info2 = new JLabel("Nom : " + centreSante.getNomCentre());
+        if (select == null) {
+            titreInfoBox = new JLabel("Aucun élément Sélectionner");
 
-                pnlInfoBox.add(titreInfoBox, gc);
-                gc.gridy = 1;
-                pnlInfoBox.add(info1, gc);
-                gc.gridy = 2;
-                pnlInfoBox.add(info2, gc);
-            }
-            case Route route -> {
-                titreInfoBox = new JLabel("Route");
-                info1 = new JLabel("Fiabilité : " + route.getFiabilite());
-                info2 = new JLabel("Distance : " + route.getDistance());
-                info3 = new JLabel("Durée : " + route.getDuree());
+            pnlInfoBox.add(titreInfoBox, gc);
+        } else {
+            switch (select) {
+                case CentreSante centreSante -> {
+                    titreInfoBox = new JLabel("Centre");
+                    info1 = new JLabel("Id : " + centreSante.getIdCentre());
+                    info2 = new JLabel("Nom : " + centreSante.getNomCentre());
 
-                pnlInfoBox.add(titreInfoBox, gc);
-                gc.gridy = 1;
-                pnlInfoBox.add(info1, gc);
-                gc.gridy = 2;
-                pnlInfoBox.add(info2, gc);
-                gc.gridy = 3;
-                pnlInfoBox.add(info3, gc);
-            }
-            default -> {
-                titreInfoBox = new JLabel("Aucun élément Sélectionner");
+                    pnlInfoBox.add(titreInfoBox, gc);
+                    gc.gridy = 1;
+                    pnlInfoBox.add(info1, gc);
+                    gc.gridy = 2;
+                    pnlInfoBox.add(info2, gc);
+                }
+                case Route route -> {
+                    titreInfoBox = new JLabel("Route");
+                    info1 = new JLabel("Fiabilité : " + route.getFiabilite());
+                    info2 = new JLabel("Distance : " + route.getDistance());
+                    info3 = new JLabel("Durée : " + route.getDuree());
 
-                pnlInfoBox.add(titreInfoBox, gc);
+                    pnlInfoBox.add(titreInfoBox, gc);
+                    gc.gridy = 1;
+                    pnlInfoBox.add(info1, gc);
+                    gc.gridy = 2;
+                    pnlInfoBox.add(info2, gc);
+                    gc.gridy = 3;
+                    pnlInfoBox.add(info3, gc);
+                }
+                default -> {
+                    titreInfoBox = new JLabel("Aucun élément Sélectionner");
+
+                    pnlInfoBox.add(titreInfoBox, gc);
+                }
             }
         }
 
@@ -311,8 +328,8 @@ public class MainWindow extends JFrame {
             initMap(mapSelectionnee);
             initStatistique(mapSelectionnee);
 
-            // TODO: a changer, soit au clique de l'user soit par default
-            initInfoBox(mapSelectionnee.getRoute(0, 1));
+            // initInfoBox(mapSelectionnee.getCentre(0));
+            initInfoBox(null);
             initSelectTrajet(mapSelectionnee);
         });
 
@@ -335,5 +352,51 @@ public class MainWindow extends JFrame {
             Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
             mapSelcetione.resetCouleursRoutes();
         });
+
+        this.vwrCarte.getDefaultView().addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+                GraphicsConfiguration gc = vwrCarte.getDefaultView().getGraphicsConfiguration();
+                AffineTransform tx = gc.getDefaultTransform();
+                float x = (float) (e.getX() * tx.getScaleX());
+                float y = (float) (e.getY() * tx.getScaleY());
+
+                GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt( x - 5, y); // -5 car probleme de
+                                                                                                 // decalage dans la
+                                                                                                 // méthode, x et y sont
+                                                                                                 // les coordonnées du
+                                                                                                 // clic de
+                                                                                                 // l'utilisateur
+                if (element != null) {
+                    String idSommet = element.getId();
+                    Object n = mapSelcetione.getCentre(idSommet);
+
+                    initInfoBox(n);
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                // throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                // throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                // throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                // throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+        });
+
     }
 }
