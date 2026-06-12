@@ -11,6 +11,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import java.io.FileNotFoundException;
 import org.graphstream.graph.implementations.SingleNode;
 
+import java.awt.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -299,6 +300,13 @@ public class Carte extends SingleGraph {
     public void resetCouleursRoutes() {
         for (Edge e : this.getEdgeSet()) {
             e.setAttribute("ui.style", "fill-color: black;");
+        }
+    }
+
+    public void colorerChemin(Path chemin, Color color) {
+
+        for (Edge e : chemin.getEdgeSet()) {
+            e.setAttribute("ui.style", "fill-color: rgb("+color.getRed()+", "+color.getGreen()+", "+color.getBlue()+");");
         }
     }
 
