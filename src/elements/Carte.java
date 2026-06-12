@@ -104,16 +104,16 @@ public class Carte extends SingleGraph {
         return this.getEdge(strTmp);
     }
 
-    public ArrayList<Integer> dijkstraDuree(CentreSante origine, CentreSante destination) {
-        ArrayList<Integer> chemin = new ArrayList<Integer>() ;
+    public Path dijkstraDuree(CentreSante origine, CentreSante destination) {
+        Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
-            double d = (double) ((Route) edge).getDuree();
-            edge.setAttribute("duree", d);
+            if (edge instanceof Route) {
+                double d = (double) ((Route) edge).getDuree();
+                edge.setAttribute("duree", d);
+            }
         }
         Dijkstra dij = djikstra(origine, "duree");
-        for (Node t : dij.getPath(destination).getNodeSet()){
-            chemin.add(t.getIndex());
-        }
+        chemin = dij.getPath(destination) ;
         dij.clear();
         return chemin ;
     }
