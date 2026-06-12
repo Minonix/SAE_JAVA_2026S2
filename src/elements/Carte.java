@@ -272,5 +272,34 @@ public class Carte extends SingleGraph {
         return carte;
     }
 
+    public void switchAffNoms() {
+        CentreSante c;
+        for (Node n : this) {
+            c = (CentreSante) n;
+            c.switchAffNomCentre();
+        }
+    }
+
+    public void switchAffIDs() {
+        CentreSante c;
+        for (Node n : this) {
+            c = (CentreSante) n;
+            c.switchAffIdCentre();
+        }
+    }
+
+    public void switchAffTypes() {
+        CentreSante c;
+        for (Node n : this) {
+            c = (CentreSante) n;
+            c.switchAffCenterType();
+        }
+    }
+
+    public void resetCouleursRoutes() {
+        for (Edge e : this.getEdgeSet()) {
+            e.setAttribute("ui.style", "fill-color: black;");
+        }
+    }
 
 }
