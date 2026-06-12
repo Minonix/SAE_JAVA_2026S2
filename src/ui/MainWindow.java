@@ -42,7 +42,7 @@ public class MainWindow extends JFrame {
             System.err.println("Fichier introuvable : data/graphe2.csv");
             map2 = new Carte("Bonjour"); // On crée une carte vide en secours pour éviter un crash
         }
-        
+
         secteurs = new ArrayList<>();
         secteurs.add(map2);
         secteurs.add(map);
@@ -165,7 +165,7 @@ public class MainWindow extends JFrame {
             depLab = new JLabel("Départ : ");
             arrLab = new JLabel("Arrivée : ");
             btnchercherDuree = new JButton("Le plus rapide");
-            btnchercherEstimation = new JButton("L'entre deux"); //TODO: a changé le nom
+            btnchercherEstimation = new JButton("L'entre deux"); // TODO: a changé le nom
             btRetourNormal = new JButton("Retour à la normal");
             cbDep = new JComboBox<>();
             cbArr = new JComboBox<>();
@@ -203,6 +203,7 @@ public class MainWindow extends JFrame {
     JLabel lbSeuil, lbChxSecteur;
     JTextField txSeuil;
     JComboBox<String> cbSecteur;
+
     private JPanel initFiltre() {
         if (pnlFiltre == null) {
             pnlFiltre = new JPanel(new GridBagLayout());
@@ -287,7 +288,7 @@ public class MainWindow extends JFrame {
             pnlStatistique.add(lbNbMaternitee, BorderLayout.CENTER);
             pnlStatistique.add(lbNbOperatoire, BorderLayout.EAST);
         }
-        
+
         lbNbCentre.setText("Centres de Nutrition : " + map.getNbNutri());
         lbNbMaternitee.setText("Maternités : " + map.getNbMat());
         lbNbOperatoire.setText("Blocs Opératoires : " + map.getNbBloc());
@@ -297,39 +298,42 @@ public class MainWindow extends JFrame {
 
     private void initListener() {
         cbSecteur.addActionListener((e) -> {
-            if (((JComboBox)e.getSource()).getSelectedIndex() == ((JComboBox)e.getSource()).getItemCount() - 1) {
+            if (((JComboBox) e.getSource()).getSelectedIndex() == ((JComboBox) e.getSource()).getItemCount() - 1) {
                 Carte nCarte = NewSecteurWindow.NewSecteur();
                 if (nCarte != null) {
                     secteurs.add(nCarte);
                     cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
-                    
+
                 }
                 cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
             }
             Carte mapSelectionnee = secteurs.get(cbSecteur.getSelectedIndex());
             initMap(mapSelectionnee);
             initStatistique(mapSelectionnee);
-            
+
             // TODO: a changer, soit au clique de l'user soit par default
-            initInfoBox(mapSelectionnee.getNbTotalCentres() > 1 ? mapSelectionnee.getRoute(0, 1) : null);
+            initInfoBox(mapSelectionnee.getRoute(0, 1));
             initSelectTrajet(mapSelectionnee);
-        });
-    
-        btnchercherDuree.addActionListener((e) -> {
-            Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-                //TODO: prendre la sortie pour utiliser sur la coloration
-                System.out.println(mapSelcetione.dijk(mapSelcetione.getCentre(cbDep.getSelectedIndex()), mapSelcetione.getCentre(cbArr.getSelectedIndex())).toString());
         });
 
         btnchercherDuree.addActionListener((e) -> {
             Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-                //TODO: prendre la sortie pour utiliser sur la coloration
-                System.out.println(mapSelcetione.dijkstraEstimation(mapSelcetione.getCentre(cbDep.getSelectedIndex()), mapSelcetione.getCentre(cbArr.getSelectedIndex())).toString());
+            mapSelcetione.resetCouleursRoutes();
+            mapSelcetione.colorerChemin(mapSelcetione.dijkstraDuree(mapSelcetione.getCentre(cbDep.getSelectedIndex()),
+                    mapSelcetione.getCentre(cbArr.getSelectedIndex())), Color.RED);
+        });
+
+        btnchercherEstimation.addActionListener((e) -> {
+            Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+            mapSelcetione.resetCouleursRoutes();
+            mapSelcetione
+                    .colorerChemin(mapSelcetione.dijkstraEstimation(mapSelcetione.getCentre(cbDep.getSelectedIndex()),
+                            mapSelcetione.getCentre(cbArr.getSelectedIndex())), Color.YELLOW);
         });
 
         btRetourNormal.addActionListener((e) -> {
             Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-                //TODO: prendre la sortie pour utiliser sur la coloration
+            mapSelcetione.resetCouleursRoutes();
         });
     }
 }
