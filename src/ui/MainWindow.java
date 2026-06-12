@@ -153,7 +153,7 @@ public class MainWindow extends JFrame {
     }
 
     JLabel depLab, arrLab;
-    JButton btnchercherDuree, btnchercherEstimation;
+    JButton btnchercherDuree, btnchercherEstimation, btRetourNormal;
     JComboBox<String> cbDep, cbArr;
 
     private JPanel initSelectTrajet(Carte carte) {
@@ -166,6 +166,7 @@ public class MainWindow extends JFrame {
             arrLab = new JLabel("Arrivée : ");
             btnchercherDuree = new JButton("Le plus rapide");
             btnchercherEstimation = new JButton("L'entre deux"); //TODO: a changé le nom
+            btRetourNormal = new JButton("Retour à la normal");
             cbDep = new JComboBox<>();
             cbArr = new JComboBox<>();
 
@@ -183,6 +184,10 @@ public class MainWindow extends JFrame {
             pnlSelectTrajet.add(cbArr, gc);
             gc.gridy = 2;
             pnlSelectTrajet.add(btnchercherEstimation, gc);
+            gc.gridwidth = 2;
+            gc.gridx = 0;
+            gc.gridy = 3;
+            pnlSelectTrajet.add(btRetourNormal, gc);
         }
 
         cbDep.removeAllItems();
@@ -312,10 +317,19 @@ public class MainWindow extends JFrame {
     
         btnchercherDuree.addActionListener((e) -> {
             Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-            if (cbDep.getSelectedItem() != cbArr.getSelectedItem()) {
                 //TODO: prendre la sortie pour utiliser sur la coloration
-                System.out.println(mapSelcetione.dijkstraDuree(mapSelcetione.getCentre(cbDep.getSelectedIndex()), mapSelcetione.getCentre(cbArr.getSelectedIndex())).toString());
-            }
+                System.out.println(mapSelcetione.dijk(mapSelcetione.getCentre(cbDep.getSelectedIndex()), mapSelcetione.getCentre(cbArr.getSelectedIndex())).toString());
+        });
+
+        btnchercherDuree.addActionListener((e) -> {
+            Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+                //TODO: prendre la sortie pour utiliser sur la coloration
+                System.out.println(mapSelcetione.dijkstraEstimation(mapSelcetione.getCentre(cbDep.getSelectedIndex()), mapSelcetione.getCentre(cbArr.getSelectedIndex())).toString());
+        });
+
+        btRetourNormal.addActionListener((e) -> {
+            Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+                //TODO: prendre la sortie pour utiliser sur la coloration
         });
     }
 }
