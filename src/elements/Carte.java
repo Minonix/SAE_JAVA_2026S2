@@ -314,4 +314,12 @@ public class Carte extends SingleGraph {
         }
     }
 
+    public void colorerSeuil(double seuil, Color color) {
+        for (Edge e : this.getEdgeSet()) {
+            if (((Route)e).getFiabilite() < seuil) {
+                e.setAttribute("ui.style", "fill-color: rgb("+color.getRed()+", "+color.getGreen()+", "+color.getBlue()+");");
+            }
+        }
+    }
+
 }

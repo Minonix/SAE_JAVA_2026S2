@@ -13,6 +13,8 @@ import org.graphstream.ui.view.Viewer;
 import java.util.EnumSet;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
@@ -21,6 +23,11 @@ import java.util.EnumSet;
 import java.io.FileNotFoundException;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.DocumentFilter;
 import javax.swing.text.View;
 public class MainWindow extends JFrame {
     // vue principale
@@ -71,7 +78,7 @@ public class MainWindow extends JFrame {
 
         gc.fill = GridBagConstraints.BOTH;
 
-        gc.weightx = 0.2;
+        gc.weightx = 0.1;
         gc.gridx = 0;
 
         gc.gridy = 0;
@@ -94,7 +101,7 @@ public class MainWindow extends JFrame {
         gc.weighty = 0.2;
         this.getContentPane().add(initBoxBtnTourne(), gc);
 
-        gc.weightx = 0.8;
+        gc.weightx = 0.9;
         gc.gridx = 1;
 
         gc.gridy = 0;
@@ -220,28 +227,34 @@ public class MainWindow extends JFrame {
     JLabel lbSeuil, lbChxSecteur;
     JTextField txSeuil;
     JComboBox<String> cbSecteur;
+    JButton btSeuil;
 
     private JPanel initFiltre() {
         if (pnlFiltre == null) {
             pnlFiltre = new JPanel(new GridBagLayout());
             pnlFiltre.setBackground(Color.DARK_GRAY);
 
-            lbSeuil = new JLabel("Seuil de dangereusité : ");
+            lbSeuil = new JLabel("Seuil de dangereusité (unité entre 1 et 10) : ");
             lbChxSecteur = new JLabel("Secteur : ");
             txSeuil = new JTextField(20);
             cbSecteur = new JComboBox<>();
+            btSeuil = new JButton("Valider");
 
             GridBagConstraints gc = new GridBagConstraints();
 
             gc.gridx = 0;
             gc.gridy = 0;
             pnlFiltre.add(lbSeuil, gc);
-            gc.gridy = 1;
+            gc.gridy = 2;
             pnlFiltre.add(lbChxSecteur, gc);
             gc.gridx = 1;
             pnlFiltre.add(cbSecteur, gc);
             gc.gridy = 0;
             pnlFiltre.add(txSeuil, gc);
+            gc.gridx = 0;
+            gc.gridy = 1;
+            gc.gridwidth = 2;
+            pnlFiltre.add(btSeuil, gc);
         }
 
         cbSecteur.removeAllItems();
@@ -398,5 +411,17 @@ public class MainWindow extends JFrame {
 
         });
 
+        btSeuil.addActionListener((e) -> {
+            int seuil = 0;
+            secteurs.get(cbSecteur.getSelectedIndex()).resetCouleursRoutes();
+            try {
+                seuil = Integer.parseInt(txSeuil.getText());
+            } catch (NumberFormatException err) {
+                JOptionPane.showMessageDialog(this,
+                        "Entrée du seuil invalide", "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+            secteurs.get(cbSecteur.getSelectedIndex()).colorerSeuil(seuil, Color.RED);
+        });
     }
 }
