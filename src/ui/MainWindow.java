@@ -300,11 +300,6 @@ public class MainWindow extends JFrame {
 
         Component view = (Component) vwrCarte.addDefaultView(false);
 
-        vwrCarte.getDefaultView().setMouseManager(new DefaultMouseManager() {
-            @Override
-            public void mouseDragged(MouseEvent e) {}
-        });
-
         pnlMap.add(view, BorderLayout.CENTER);
         pnlMap.revalidate();
         pnlMap.repaint();
@@ -420,6 +415,29 @@ public class MainWindow extends JFrame {
 
         });
 
+        //TODO: temp pour try a regler le probleme sous linux
+        vwrCarte.getDefaultView().setMouseManager(new DefaultMouseManager() {
+            public void mouseDragged(MouseEvent e) {
+                                Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+                GraphicsConfiguration gc = vwrCarte.getDefaultView().getGraphicsConfiguration();
+                AffineTransform tx = gc.getDefaultTransform();
+                float x = (float) (e.getX() * tx.getScaleX());
+                float y = (float) (e.getY() * tx.getScaleY());
+
+                GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x - 5, y); // -5 car probleme de
+                                                                                                 // decalage dans la
+                                                                                                 // méthode, x et y sont
+                                                                                                 // les coordonnées du
+                                                                                                 // clic de
+                                                                                                 // l'utilisateur
+                if (element != null) {
+                    String idSommet = element.getId();
+                    Object n = mapSelcetione.getCentre(idSommet);
+
+                    initInfoBox(n);
+                }
+            }
+        });
         btSeuil.addActionListener((e) -> {
             int seuil = 0;
             secteurs.get(cbSecteur.getSelectedIndex()).resetCouleursRoutes();
