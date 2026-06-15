@@ -7,6 +7,8 @@ import elements.Carte;
 import org.graphstream.ui.graphicGraph.GraphicElement;
 // import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.view.Viewer;
+import org.graphstream.ui.view.util.DefaultMouseManager;
+
 // import org.graphstream.ui.view.util.InteractiveElement;
 // import org.graphstream.graph.Node;
 // import org.graphstream.graph.Edge;
@@ -29,9 +31,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.View;
+
 public class MainWindow extends JFrame {
     // vue principale
-    JPanel pnlInfoBox, pnlSelectTrajet, pnlMap, pnlStatistique, pnlBoxBtnTourne, pnlFiltre;
+    MyPanel pnlInfoBox, pnlSelectTrajet, pnlMap, pnlStatistique, pnlBoxBtnTourne, pnlFiltre;
     Viewer vwrCarte;
     JButton btLogo;
     JComboBox<String> cbSelectCarte;
@@ -120,10 +123,10 @@ public class MainWindow extends JFrame {
 
     JLabel titreInfoBox, info1, info2, info3;
 
-    private JPanel initInfoBox(Object select) {
+    private MyPanel initInfoBox(Object select) {
         if (pnlInfoBox == null) {
-            pnlInfoBox = new JPanel(new GridBagLayout());
-            pnlInfoBox.setBackground(Color.LIGHT_GRAY);
+            pnlInfoBox = new MyPanel(50, Color.blue);
+            pnlInfoBox.setLayout(new GridBagLayout());
         } else {
             pnlInfoBox.removeAll();
         }
@@ -180,11 +183,12 @@ public class MainWindow extends JFrame {
     JButton btnchercherDuree, btnchercherEstimation, btRetourNormal;
     JComboBox<String> cbDep, cbArr;
 
-    private JPanel initSelectTrajet(Carte carte) {
+    private MyPanel initSelectTrajet(Carte carte) {
         if (pnlSelectTrajet == null) {
-            pnlSelectTrajet = new JPanel(new GridBagLayout());
+            pnlSelectTrajet = new MyPanel(50, Color.GRAY);
+            pnlSelectTrajet.setLayout(new GridBagLayout());
+
             GridBagConstraints gc = new GridBagConstraints();
-            pnlSelectTrajet.setBackground(Color.GRAY);
 
             depLab = new JLabel("Départ : ");
             arrLab = new JLabel("Arrivée : ");
@@ -229,10 +233,10 @@ public class MainWindow extends JFrame {
     JComboBox<String> cbSecteur;
     JButton btSeuil;
 
-    private JPanel initFiltre() {
+    private MyPanel initFiltre() {
         if (pnlFiltre == null) {
-            pnlFiltre = new JPanel(new GridBagLayout());
-            pnlFiltre.setBackground(Color.DARK_GRAY);
+            pnlFiltre = new MyPanel(50, Color.GREEN);
+            pnlFiltre.setLayout(new GridBagLayout());
 
             lbSeuil = new JLabel("Seuil de dangereusité (unité entre 1 et 10) : ");
             lbChxSecteur = new JLabel("Secteur : ");
@@ -268,10 +272,9 @@ public class MainWindow extends JFrame {
 
     JButton btTourne;
 
-    private JPanel initBoxBtnTourne() {
-        pnlBoxBtnTourne = new JPanel(new BorderLayout());
-
-        pnlBoxBtnTourne.setBackground(Color.ORANGE);
+    private MyPanel initBoxBtnTourne() {
+        pnlBoxBtnTourne = new MyPanel(50, Color.MAGENTA);
+        pnlBoxBtnTourne.setLayout(new BorderLayout());
 
         btTourne = new JButton("Créer une Tournée");
 
@@ -280,10 +283,10 @@ public class MainWindow extends JFrame {
         return pnlBoxBtnTourne;
     }
 
-    private JPanel initMap(Carte map) {
+    private MyPanel initMap(Carte map) {
         if (pnlMap == null) {
-            pnlMap = new JPanel(new BorderLayout());
-            pnlMap.setBackground(Color.WHITE);
+            pnlMap = new MyPanel(50, Color.ORANGE);
+            pnlMap.setLayout(new BorderLayout());
         } else {
             pnlMap.removeAll();
             if (vwrCarte != null) {
@@ -296,6 +299,12 @@ public class MainWindow extends JFrame {
         vwrCarte.enableAutoLayout();
 
         Component view = (Component) vwrCarte.addDefaultView(false);
+
+        vwrCarte.getDefaultView().setMouseManager(new DefaultMouseManager() {
+            @Override
+            public void mouseDragged(MouseEvent e) {}
+        });
+
         pnlMap.add(view, BorderLayout.CENTER);
         pnlMap.revalidate();
         pnlMap.repaint();
@@ -305,10 +314,10 @@ public class MainWindow extends JFrame {
 
     JLabel lbNbCentre, lbNbMaternitee, lbNbOperatoire;
 
-    private JPanel initStatistique(Carte map) {
+    private MyPanel initStatistique(Carte map) {
         if (pnlStatistique == null) {
-            pnlStatistique = new JPanel(new BorderLayout(100, 10));
-            pnlStatistique.setBackground(Color.CYAN);
+            pnlStatistique = new MyPanel(50, Color.PINK);
+            pnlStatistique.setLayout(new BorderLayout(100, 10));
 
             lbNbCentre = new JLabel();
             lbNbMaternitee = new JLabel();
@@ -375,7 +384,7 @@ public class MainWindow extends JFrame {
                 float x = (float) (e.getX() * tx.getScaleX());
                 float y = (float) (e.getY() * tx.getScaleY());
 
-                GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt( x - 5, y); // -5 car probleme de
+                GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x - 5, y); // -5 car probleme de
                                                                                                  // decalage dans la
                                                                                                  // méthode, x et y sont
                                                                                                  // les coordonnées du
