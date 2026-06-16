@@ -90,13 +90,20 @@ public class NewSecteurWindow extends JDialog {
         });
 
         btAlea.addActionListener(e -> {
-            try {
-                int nbSommets = Integer.parseInt(txParam.getText().trim());
-                carteCreee = Carte.construireGrapheAleatoire(txNom.getText(), nbSommets);
-                this.dispose(); // Ferme la fenêtre si tout s'est bien passé
-            } catch (NumberFormatException ex) {
+            if (!txNom.getText().isBlank()) {
+                try {
+                    int nbSommets = Integer.parseInt(txParam.getText().trim());
+                    carteCreee = Carte.construireGrapheAleatoire(txNom.getText(), nbSommets);
+                    this.dispose(); // Ferme la fenêtre si tout s'est bien passé
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this,
+                            "Pour une génération aléatoire, veuillez entrer un nombre de sommets valide.", "Erreur",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            else {
                 JOptionPane.showMessageDialog(this,
-                        "Pour une génération aléatoire, veuillez entrer un nombre de sommets valide.", "Erreur",
+                        "Le nom du graphe ne doit pas être vide ou composé de caractères blancs", "Erreur",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -119,7 +126,7 @@ public class NewSecteurWindow extends JDialog {
 
             if (choose.getSelectedFile() != null) {
                 try {
-                    carteCreee = Carte.Parsing(txNom.getText(), choose.getSelectedFile().getPath());
+                    carteCreee = Carte.Parsing(choose.getSelectedFile().getName().substring(0, choose.getSelectedFile().getName().length()-4), choose.getSelectedFile().getPath());
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
                 } catch (Exception e2) {
@@ -132,6 +139,7 @@ public class NewSecteurWindow extends JDialog {
 
     public static Carte NewSecteur() {
         NewSecteurWindow nSect = new NewSecteurWindow();
+        // TODO
         nSect.setVisible(true); // L'exécution du code s'arrête ici jusqu'au this.dispose()
 
         return nSect.carteCreee; // Une fois fermé, on renvoie l'objet nouvellement créé
