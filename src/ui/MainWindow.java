@@ -12,25 +12,14 @@ import org.graphstream.ui.view.util.DefaultMouseManager;
 // import org.graphstream.ui.view.util.InteractiveElement;
 // import org.graphstream.graph.Node;
 // import org.graphstream.graph.Edge;
-import java.util.EnumSet;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.io.FileNotFoundException;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.DocumentFilter;
-import javax.swing.text.View;
 
 public class MainWindow extends JFrame {
     // vue principale
@@ -40,9 +29,10 @@ public class MainWindow extends JFrame {
     JComboBox<String> cbSelectCarte;
 
     // menu
-    JMenu mFichier, mAjDistrict, mbarMain, mAffichage;
-    JMenuItem miImporter, miAleatoire;
-    JCheckBoxMenuItem mixAfficherInfosCarte, mixAfficherRoutesDangereuses;
+    JMenuBar bar;
+    JMenu mDistrict, mAffichage;
+    JMenuItem miNouveau;
+    JCheckBoxMenuItem mixAfficherId, mixAfficherNom, mixAfficherType;
 
     ArrayList<Carte> secteurs;
 
@@ -69,11 +59,36 @@ public class MainWindow extends JFrame {
         secteurs.add(map);
 
         initComponent();
+        initMenu();
         initListener();
 
         this.setLocationRelativeTo(null);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
+    }
+
+    private void initMenu() {
+        bar = new JMenuBar();
+        mDistrict = new JMenu("District");
+        mAffichage = new JMenu("Affichage");
+        miNouveau = new JMenuItem("Nouveau...");
+        mixAfficherId = new JCheckBoxMenuItem("IDs des centres");
+        mixAfficherNom = new JCheckBoxMenuItem("Noms des centres");
+        mixAfficherType = new JCheckBoxMenuItem("Types des centres");
+
+        mDistrict.add(miNouveau);
+        mAffichage.add(mixAfficherId);
+        mAffichage.add(mixAfficherNom);
+        mAffichage.add(mixAfficherType);
+
+        mixAfficherNom.setSelected(true);
+        mixAfficherType.setSelected(true);
+        mixAfficherId.setSelected(true);
+
+        bar.add(mDistrict);
+        bar.add(mAffichage);
+
+        this.setJMenuBar(bar);
     }
 
     private void initComponent() {
@@ -477,6 +492,34 @@ public class MainWindow extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
             }
             secteurs.get(cbSecteur.getSelectedIndex()).colorerSeuil(seuil, Color.RED);
+        });
+
+        miNouveau.addActionListener(e -> {
+            Carte nCarte = NewSecteurWindow.NewSecteur();
+            if (nCarte != null) {
+                secteurs.add(nCarte);
+                cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
+
+            }
+            cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
+        });
+
+        mixAfficherId.addActionListener(e -> {
+            for (Carte secteur : secteurs) {
+                secteur.switchAffIDs();
+            }
+        });
+
+        mixAfficherNom.addActionListener(e -> {
+            for (Carte secteur : secteurs) {
+                secteur.switchAffNoms();
+            }
+        });
+
+        mixAfficherType.addActionListener(e -> {
+            for (Carte secteur : secteurs) {
+                secteur.switchAffTypes();
+            }
         });
     }
 }

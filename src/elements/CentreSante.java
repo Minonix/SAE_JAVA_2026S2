@@ -62,15 +62,18 @@ public class CentreSante extends SingleNode {
     public void switchAffIdCentre() {
         if (affIdCentre.isEmpty()) affIdCentre = "ID: "+idCentre;
         else affIdCentre = "";
+        initVue();
     }
 
     public void switchAffCenterType() {
         if (affCenterType.isEmpty()) affCenterType= ", Type : "+centerType;
         else affCenterType = "";
+        initVue();
     }
 
     public void switchAffNomCentre() {
         if (affNomCentre.isEmpty()) affNomCentre = ", Nom : "+nomCentre;
         else affNomCentre = "";
+        initVue();
     }
 }
