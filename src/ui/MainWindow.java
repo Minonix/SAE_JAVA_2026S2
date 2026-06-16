@@ -99,10 +99,13 @@ public class MainWindow extends JFrame {
         gc.weighty = 0.3;
         this.getContentPane().add(initSelectTrajet(secteurs.get(cbSecteur.getSelectedIndex())), gc);
 
+        gc.fill = GridBagConstraints.NONE;
+        gc.anchor = GridBagConstraints.CENTER;
         gc.gridy = 5;
         gc.gridheight = 1;
         gc.weighty = 0.2;
         this.getContentPane().add(initBoxBtnTourne(), gc);
+        gc.fill = GridBagConstraints.BOTH;
 
         gc.weightx = 0.9;
         gc.gridx = 1;
@@ -110,7 +113,7 @@ public class MainWindow extends JFrame {
         gc.gridy = 0;
         gc.gridheight = 5;
         gc.gridwidth = 1;
-        gc.weighty = 0.8;
+        gc.weighty = 0.9;
         this.getContentPane().add(initMap(secteurs.get(cbSecteur.getSelectedIndex())), gc);
 
         gc.gridy = 5;
@@ -238,7 +241,7 @@ public class MainWindow extends JFrame {
             pnlFiltre = new MyPanel(50, Color.GREEN);
             pnlFiltre.setLayout(new GridBagLayout());
 
-            lbSeuil = new JLabel("Seuil de dangereusité (unité entre 1 et 10) : ");
+            lbSeuil = new JLabel("Seuil (unité entre 1 et 10) : ");
             lbChxSecteur = new JLabel("Secteur : ");
             txSeuil = new JTextField(20);
             cbSecteur = new JComboBox<>();
@@ -275,6 +278,7 @@ public class MainWindow extends JFrame {
     private MyPanel initBoxBtnTourne() {
         pnlBoxBtnTourne = new MyPanel(50, Color.MAGENTA);
         pnlBoxBtnTourne.setLayout(new BorderLayout());
+        // pnlBoxBtnTourne.setPreferredSize(new Dimension(30, 50));
 
         btTourne = new JButton("Créer une Tournée");
 
@@ -285,7 +289,7 @@ public class MainWindow extends JFrame {
 
     private MyPanel initMap(Carte map) {
         if (pnlMap == null) {
-            pnlMap = new MyPanel(50, Color.ORANGE);
+            pnlMap = new MyPanel(0, Color.ORANGE);
             pnlMap.setLayout(new BorderLayout());
         } else {
             pnlMap.removeAll();
@@ -299,6 +303,34 @@ public class MainWindow extends JFrame {
         vwrCarte.enableAutoLayout();
 
         Component view = (Component) vwrCarte.addDefaultView(false);
+
+        vwrCarte.getDefaultView().setMouseManager(new DefaultMouseManager() {
+
+            public void mouseDragged(MouseEvent e) {
+            }
+
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+
+                Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+                GraphicsConfiguration gc = vwrCarte.getDefaultView().getGraphicsConfiguration();
+                AffineTransform tx = gc.getDefaultTransform();
+
+                float x = (float) (e.getX() * tx.getScaleX());
+                float y = (float) (e.getY() * tx.getScaleY());
+
+                GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x, y);
+
+                if (element != null) {
+                    String idSommet = element.getId();
+                    Object n = mapSelcetione.getCentre(idSommet);
+                    initInfoBox(n);
+                }// else {
+                //     // Optionnel : Vider la boîte si on clique dans le vide
+                //     initInfoBox(null);
+                // }
+            }
+        });
 
         pnlMap.add(view, BorderLayout.CENTER);
         pnlMap.revalidate();
@@ -370,74 +402,52 @@ public class MainWindow extends JFrame {
             mapSelcetione.resetCouleursRoutes();
         });
 
-        this.vwrCarte.getDefaultView().addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-                GraphicsConfiguration gc = vwrCarte.getDefaultView().getGraphicsConfiguration();
-                AffineTransform tx = gc.getDefaultTransform();
-                float x = (float) (e.getX() * tx.getScaleX());
-                float y = (float) (e.getY() * tx.getScaleY());
+        // this.vwrCarte.getDefaultView().addMouseListener(new MouseListener() {
+        //     @Override
+        //     public void mouseClicked(MouseEvent e) {
+        //         Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+        //         GraphicsConfiguration gc = vwrCarte.getDefaultView().getGraphicsConfiguration();
+        //         AffineTransform tx = gc.getDefaultTransform();
+        //         float x = (float) (e.getX() * tx.getScaleX());
+        //         float y = (float) (e.getY() * tx.getScaleY());
 
-                GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x - 5, y); // -5 car probleme de
-                                                                                                 // decalage dans la
-                                                                                                 // méthode, x et y sont
-                                                                                                 // les coordonnées du
-                                                                                                 // clic de
-                                                                                                 // l'utilisateur
-                if (element != null) {
-                    String idSommet = element.getId();
-                    Object n = mapSelcetione.getCentre(idSommet);
+        //         GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x - 5, y); // -5 car probleme de
+        //                                                                                          // decalage dans la
+        //                                                                                          // méthode, x et y sont
+        //                                                                                          // les coordonnées du
+        //                                                                                          // clic de
+        //                                                                                          // l'utilisateur
+        //         if (element != null) {
+        //             String idSommet = element.getId();
+        //             Object n = mapSelcetione.getCentre(idSommet);
 
-                    initInfoBox(n);
-                }
-            }
+        //             initInfoBox(n);
+        //         }
+        //     }
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-                // throw new UnsupportedOperationException("Not supported yet.");
-            }
+        //     @Override
+        //     public void mousePressed(MouseEvent e) {
+        //         // throw new UnsupportedOperationException("Not supported yet.");
+        //     }
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                // throw new UnsupportedOperationException("Not supported yet.");
-            }
+        //     @Override
+        //     public void mouseReleased(MouseEvent e) {
+        //         // throw new UnsupportedOperationException("Not supported yet.");
+        //     }
 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                // throw new UnsupportedOperationException("Not supported yet.");
-            }
+        //     @Override
+        //     public void mouseEntered(MouseEvent e) {
+        //         // throw new UnsupportedOperationException("Not supported yet.");
+        //     }
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                // throw new UnsupportedOperationException("Not supported yet.");
-            }
+        //     @Override
+        //     public void mouseExited(MouseEvent e) {
+        //         // throw new UnsupportedOperationException("Not supported yet.");
+        //     }
 
-        });
+        // });
 
-        //TODO: temp pour try a regler le probleme sous linux
-        vwrCarte.getDefaultView().setMouseManager(new DefaultMouseManager() {
-            public void mouseDragged(MouseEvent e) {
-                                Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-                GraphicsConfiguration gc = vwrCarte.getDefaultView().getGraphicsConfiguration();
-                AffineTransform tx = gc.getDefaultTransform();
-                float x = (float) (e.getX() * tx.getScaleX());
-                float y = (float) (e.getY() * tx.getScaleY());
 
-                GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x - 5, y); // -5 car probleme de
-                                                                                                 // decalage dans la
-                                                                                                 // méthode, x et y sont
-                                                                                                 // les coordonnées du
-                                                                                                 // clic de
-                                                                                                 // l'utilisateur
-                if (element != null) {
-                    String idSommet = element.getId();
-                    Object n = mapSelcetione.getCentre(idSommet);
-
-                    initInfoBox(n);
-                }
-            }
-        });
         btSeuil.addActionListener((e) -> {
             int seuil = 0;
             secteurs.get(cbSecteur.getSelectedIndex()).resetCouleursRoutes();
