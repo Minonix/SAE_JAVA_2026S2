@@ -72,6 +72,7 @@ public class MainWindow extends JFrame {
         initListener();
 
         this.setLocationRelativeTo(null);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
     }
 
@@ -79,7 +80,8 @@ public class MainWindow extends JFrame {
         this.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gc = new GridBagConstraints();
 
-        gc.fill = GridBagConstraints.BOTH;
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.anchor = GridBagConstraints.CENTER;
 
         gc.weightx = 0.1;
         gc.gridx = 0;
@@ -100,10 +102,9 @@ public class MainWindow extends JFrame {
         this.getContentPane().add(initSelectTrajet(secteurs.get(cbSecteur.getSelectedIndex())), gc);
 
         gc.fill = GridBagConstraints.NONE;
-        gc.anchor = GridBagConstraints.CENTER;
         gc.gridy = 5;
         gc.gridheight = 1;
-        gc.weighty = 0.2;
+        gc.weighty = 0.1;
         this.getContentPane().add(initBoxBtnTourne(), gc);
         gc.fill = GridBagConstraints.BOTH;
 
@@ -116,11 +117,13 @@ public class MainWindow extends JFrame {
         gc.weighty = 0.9;
         this.getContentPane().add(initMap(secteurs.get(cbSecteur.getSelectedIndex())), gc);
 
+        gc.fill = GridBagConstraints.VERTICAL;
         gc.gridy = 5;
         gc.gridheight = 1;
-        gc.weighty = 0.2;
+        gc.weighty = 0.1;
         this.getContentPane().add(initStatistique(secteurs.get(cbSecteur.getSelectedIndex())), gc);
 
+        this.getContentPane().setBackground(Color.WHITE);
         this.pack();
     }
 
@@ -134,6 +137,8 @@ public class MainWindow extends JFrame {
             pnlInfoBox.removeAll();
         }
         GridBagConstraints gc = new GridBagConstraints();
+        Insets inset = new Insets(10, 0, 0, 0);
+        gc.insets = inset;
         gc.gridx = 0;
         gc.gridy = 0;
 
@@ -148,8 +153,10 @@ public class MainWindow extends JFrame {
                     info1 = new JLabel("Id : " + centreSante.getIdCentre());
                     info2 = new JLabel("Nom : " + centreSante.getNomCentre());
 
+                    inset.set(10, 0, 10, 0);
                     pnlInfoBox.add(titreInfoBox, gc);
                     gc.gridy = 1;
+                    inset.set(0, 0, 5, 0);
                     pnlInfoBox.add(info1, gc);
                     gc.gridy = 2;
                     pnlInfoBox.add(info2, gc);
@@ -192,6 +199,7 @@ public class MainWindow extends JFrame {
             pnlSelectTrajet.setLayout(new GridBagLayout());
 
             GridBagConstraints gc = new GridBagConstraints();
+            gc.insets = new Insets(10, 0, 10, 10);
 
             depLab = new JLabel("Départ : ");
             arrLab = new JLabel("Arrivée : ");
@@ -243,11 +251,12 @@ public class MainWindow extends JFrame {
 
             lbSeuil = new JLabel("Seuil (unité entre 1 et 10) : ");
             lbChxSecteur = new JLabel("Secteur : ");
-            txSeuil = new JTextField(20);
+            txSeuil = new JTextField(10);
             cbSecteur = new JComboBox<>();
             btSeuil = new JButton("Valider");
 
             GridBagConstraints gc = new GridBagConstraints();
+            gc.insets = new Insets(10, 0, 10, 10);
 
             gc.gridx = 0;
             gc.gridy = 0;
@@ -324,11 +333,12 @@ public class MainWindow extends JFrame {
                 if (element != null) {
                     String idSommet = element.getId();
                     Object n = mapSelcetione.getCentre(idSommet);
-                    initInfoBox(n);
-                }// else {
-                //     // Optionnel : Vider la boîte si on clique dans le vide
-                //     initInfoBox(null);
-                // }
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        new InfosCentreWindow((CentreSante)n);
+                    } else {
+                        initInfoBox(n);
+                    }
+                }
             }
         });
 
@@ -344,15 +354,22 @@ public class MainWindow extends JFrame {
     private MyPanel initStatistique(Carte map) {
         if (pnlStatistique == null) {
             pnlStatistique = new MyPanel(50, Color.PINK);
-            pnlStatistique.setLayout(new BorderLayout(100, 10));
+            pnlStatistique.setLayout(new GridBagLayout());
 
             lbNbCentre = new JLabel();
             lbNbMaternitee = new JLabel();
             lbNbOperatoire = new JLabel();
 
-            pnlStatistique.add(lbNbCentre, BorderLayout.WEST);
-            pnlStatistique.add(lbNbMaternitee, BorderLayout.CENTER);
-            pnlStatistique.add(lbNbOperatoire, BorderLayout.EAST);
+            GridBagConstraints gc = new GridBagConstraints();
+            gc.insets = new Insets(0, 20, 0, 20);
+
+            gc.gridy = 0;
+            gc.gridx = 0;
+            pnlStatistique.add(lbNbCentre, gc);
+            gc.gridx = 1;
+            pnlStatistique.add(lbNbMaternitee, gc);
+            gc.gridx = 2;
+            pnlStatistique.add(lbNbOperatoire, gc);
         }
 
         lbNbCentre.setText("Centres de Nutrition : " + map.getNbNutri());
@@ -403,50 +420,51 @@ public class MainWindow extends JFrame {
         });
 
         // this.vwrCarte.getDefaultView().addMouseListener(new MouseListener() {
-        //     @Override
-        //     public void mouseClicked(MouseEvent e) {
-        //         Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-        //         GraphicsConfiguration gc = vwrCarte.getDefaultView().getGraphicsConfiguration();
-        //         AffineTransform tx = gc.getDefaultTransform();
-        //         float x = (float) (e.getX() * tx.getScaleX());
-        //         float y = (float) (e.getY() * tx.getScaleY());
+        // @Override
+        // public void mouseClicked(MouseEvent e) {
+        // Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+        // GraphicsConfiguration gc =
+        // vwrCarte.getDefaultView().getGraphicsConfiguration();
+        // AffineTransform tx = gc.getDefaultTransform();
+        // float x = (float) (e.getX() * tx.getScaleX());
+        // float y = (float) (e.getY() * tx.getScaleY());
 
-        //         GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x - 5, y); // -5 car probleme de
-        //                                                                                          // decalage dans la
-        //                                                                                          // méthode, x et y sont
-        //                                                                                          // les coordonnées du
-        //                                                                                          // clic de
-        //                                                                                          // l'utilisateur
-        //         if (element != null) {
-        //             String idSommet = element.getId();
-        //             Object n = mapSelcetione.getCentre(idSommet);
+        // GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x - 5,
+        // y); // -5 car probleme de
+        // // decalage dans la
+        // // méthode, x et y sont
+        // // les coordonnées du
+        // // clic de
+        // // l'utilisateur
+        // if (element != null) {
+        // String idSommet = element.getId();
+        // Object n = mapSelcetione.getCentre(idSommet);
 
-        //             initInfoBox(n);
-        //         }
-        //     }
+        // initInfoBox(n);
+        // }
+        // }
 
-        //     @Override
-        //     public void mousePressed(MouseEvent e) {
-        //         // throw new UnsupportedOperationException("Not supported yet.");
-        //     }
+        // @Override
+        // public void mousePressed(MouseEvent e) {
+        // // throw new UnsupportedOperationException("Not supported yet.");
+        // }
 
-        //     @Override
-        //     public void mouseReleased(MouseEvent e) {
-        //         // throw new UnsupportedOperationException("Not supported yet.");
-        //     }
+        // @Override
+        // public void mouseReleased(MouseEvent e) {
+        // // throw new UnsupportedOperationException("Not supported yet.");
+        // }
 
-        //     @Override
-        //     public void mouseEntered(MouseEvent e) {
-        //         // throw new UnsupportedOperationException("Not supported yet.");
-        //     }
+        // @Override
+        // public void mouseEntered(MouseEvent e) {
+        // // throw new UnsupportedOperationException("Not supported yet.");
+        // }
 
-        //     @Override
-        //     public void mouseExited(MouseEvent e) {
-        //         // throw new UnsupportedOperationException("Not supported yet.");
-        //     }
+        // @Override
+        // public void mouseExited(MouseEvent e) {
+        // // throw new UnsupportedOperationException("Not supported yet.");
+        // }
 
         // });
-
 
         btSeuil.addActionListener((e) -> {
             int seuil = 0;
