@@ -9,6 +9,8 @@ import org.graphstream.ui.graphicGraph.GraphicElement;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.util.DefaultMouseManager;
 
+import Exception.NoChangeException;
+
 // import org.graphstream.ui.view.util.InteractiveElement;
 // import org.graphstream.graph.Node;
 // import org.graphstream.graph.Edge;
@@ -397,7 +399,12 @@ public class MainWindow extends JFrame {
     private void initListener() {
         cbSecteur.addActionListener((e) -> {
             if (((JComboBox) e.getSource()).getSelectedIndex() == ((JComboBox) e.getSource()).getItemCount() - 1) {
-                Carte nCarte = NewSecteurWindow.NewSecteur();
+                Carte nCarte;
+                try {
+                    nCarte = NewSecteurWindow.NewSecteur();
+                } catch (NoChangeException e1) {
+                    return;
+                }
                 if (nCarte != null) {
                     secteurs.add(nCarte);
                     cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
@@ -495,13 +502,13 @@ public class MainWindow extends JFrame {
         });
 
         miNouveau.addActionListener(e -> {
-            Carte nCarte = NewSecteurWindow.NewSecteur();
-            if (nCarte != null) {
+            Carte nCarte;
+            try {
+                nCarte = NewSecteurWindow.NewSecteur();
                 secteurs.add(nCarte);
                 cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
-
-            }
-            cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
+                cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
+            } catch (NoChangeException e1) {} //TODO: 
         });
 
         mixAfficherId.addActionListener(e -> {

@@ -1,5 +1,6 @@
 package ui;
 
+import Exception.NoChangeException;
 import elements.Carte;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,17 +18,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
 public class NewSecteurWindow extends JDialog {
-    //TODO: faire en sorte qu'on doit obligatoirement avec un nom
 
-    // L'objet que nous allons construire et retourner
     private Carte carteCreee;
-
-    // Les composants interactifs à partager entre initComponent et initListener
     private JTextField txNom;
     private JTextField txParam;
     private JButton btRetour, btAlea, btChemin;
 
-    public NewSecteurWindow() {
+    public NewSecteurWindow(){
         super();
         this.setTitle("Création d'un Nouveau Secteur");
         this.setModal(true);
@@ -86,7 +83,7 @@ public class NewSecteurWindow extends JDialog {
 
     private void initListener() {
         btRetour.addActionListener(e -> {
-            this.dispose();
+            NewSecteurWindow.this.dispose();
         });
 
         btAlea.addActionListener(e -> {
@@ -103,7 +100,7 @@ public class NewSecteurWindow extends JDialog {
             }
             else {
                 JOptionPane.showMessageDialog(this,
-                        "Le nom du graphe ne doit pas être vide ou composé de caractères blancs", "Erreur",
+                        "Veuillez ajouter un titre au Secteur", "Erreur",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -119,10 +116,7 @@ public class NewSecteurWindow extends JDialog {
             FileNameExtensionFilter filter = new FileNameExtensionFilter("Fichier CSV", "csv");
             choose.addChoosableFileFilter(filter);
 
-            int res = choose.showOpenDialog(null);
-            if (res == JFileChooser.APPROVE_OPTION) {
-                System.out.println(choose.getSelectedFile().getPath());
-            }
+            choose.showOpenDialog(this);
 
             if (choose.getSelectedFile() != null) {
                 try {
@@ -135,20 +129,26 @@ public class NewSecteurWindow extends JDialog {
                     }
                     carteCreee = Carte.Parsing(name, choose.getSelectedFile().getPath());
                 } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
+                    JOptionPane.showMessageDialog(this,
+                        "Erreur dans la recherche du fichier : " + e1, "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
                 } catch (Exception e2) {
-                    e2.printStackTrace();
+                    JOptionPane.showMessageDialog(this,
+                        "Autre erreur : " + e2, "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
                 }
+                NewSecteurWindow.this.dispose();
             }
-            NewSecteurWindow.this.dispose();
         });
     }
 
-    public static Carte NewSecteur() {
+    public static Carte NewSecteur() throws NoChangeException{
         NewSecteurWindow nSect = new NewSecteurWindow();
-        // TODO
         nSect.setVisible(true); // L'exécution du code s'arrête ici jusqu'au this.dispose()
-
-        return nSect.carteCreee; // Une fois fermé, on renvoie l'objet nouvellement créé
+        if (nSect.carteCreee == null) {
+            throw new NoChangeException();
+        } else {
+            return nSect.carteCreee; // Une fois fermé, on renvoie l'objet nouvellement créé
+        }
     }
 }
