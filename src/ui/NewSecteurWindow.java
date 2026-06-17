@@ -126,7 +126,14 @@ public class NewSecteurWindow extends JDialog {
 
             if (choose.getSelectedFile() != null) {
                 try {
-                    carteCreee = Carte.Parsing(choose.getSelectedFile().getName().substring(0, choose.getSelectedFile().getName().length()-4), choose.getSelectedFile().getPath());
+                    String name;
+                    if (txNom.getText().isBlank()) {
+                        name = choose.getSelectedFile().getName().substring(0, choose.getSelectedFile().getName().length()-4);
+                    }
+                    else {
+                        name = txNom.getText();
+                    }
+                    carteCreee = Carte.Parsing(name, choose.getSelectedFile().getPath());
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
                 } catch (Exception e2) {
