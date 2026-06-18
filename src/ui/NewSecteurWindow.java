@@ -115,7 +115,7 @@ public class NewSecteurWindow extends JDialog {
             choose.setAcceptAllFileFilterUsed(false);
             FileNameExtensionFilter filter = new FileNameExtensionFilter("Fichier CSV", "csv");
             choose.addChoosableFileFilter(filter);
-
+            
             choose.showOpenDialog(this);
 
             if (choose.getSelectedFile() != null) {

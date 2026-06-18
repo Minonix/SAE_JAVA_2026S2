@@ -2,6 +2,7 @@ package ui;
 
 import elements.CentreSante;
 import elements.Route;
+import util.TourneeCamion;
 import elements.Carte;
 
 import org.graphstream.ui.graphicGraph.GraphicElement;
@@ -441,52 +442,25 @@ public class MainWindow extends JFrame {
             mapSelcetione.resetCouleursRoutes();
         });
 
-        // this.vwrCarte.getDefaultView().addMouseListener(new MouseListener() {
-        // @Override
-        // public void mouseClicked(MouseEvent e) {
-        // Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-        // GraphicsConfiguration gc =
-        // vwrCarte.getDefaultView().getGraphicsConfiguration();
-        // AffineTransform tx = gc.getDefaultTransform();
-        // float x = (float) (e.getX() * tx.getScaleX());
-        // float y = (float) (e.getY() * tx.getScaleY());
-
-        // GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x - 5,
-        // y); // -5 car probleme de
-        // // decalage dans la
-        // // méthode, x et y sont
-        // // les coordonnées du
-        // // clic de
-        // // l'utilisateur
-        // if (element != null) {
-        // String idSommet = element.getId();
-        // Object n = mapSelcetione.getCentre(idSommet);
-
-        // initInfoBox(n);
-        // }
-        // }
-
-        // @Override
-        // public void mousePressed(MouseEvent e) {
-        // // throw new UnsupportedOperationException("Not supported yet.");
-        // }
-
-        // @Override
-        // public void mouseReleased(MouseEvent e) {
-        // // throw new UnsupportedOperationException("Not supported yet.");
-        // }
-
-        // @Override
-        // public void mouseEntered(MouseEvent e) {
-        // // throw new UnsupportedOperationException("Not supported yet.");
-        // }
-
-        // @Override
-        // public void mouseExited(MouseEvent e) {
-        // // throw new UnsupportedOperationException("Not supported yet.");
-        // }
-
-        // });
+        btTourne.addActionListener((e) -> {
+            Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+            Object[] choix = {1, 2, "Retour"};
+            int rep = JOptionPane.showOptionDialog(this, "Choisir le nombre de camion",
+            "Choix nombre de camion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, choix, choix[0]);
+            switch (rep) {
+                //TODO: ajoute une boite de dialogue pour donnée la durée
+                case 0 -> {
+                    ArrayList<CentreSante> res1c = TourneeCamion.tourneeGlouton(mapSelcetione);
+                    ExporteCSV.ExporteCSV1c(res1c, mapSelcetione, (String) cbSecteur.getSelectedItem());
+                }
+                case 1 -> {
+                    ArrayList<CentreSante>[] res2c = TourneeCamion.tourneeGlouton2C(mapSelcetione);
+                    ExporteCSV.ExporteCSV2c(res2c, mapSelcetione, (String) cbSecteur.getSelectedItem());
+                }
+                case 2 -> {}
+                default -> JOptionPane.showMessageDialog(this, "Erreur = retour incorrecte");
+            }
+        });
 
         btSeuil.addActionListener((e) -> {
             int seuil = 0;
