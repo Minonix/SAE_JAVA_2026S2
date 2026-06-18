@@ -124,15 +124,18 @@ public class Carte extends SingleGraph {
     }
 
     public Path dijkstraDistance(CentreSante origine, CentreSante destination) {
+        Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
             double d = (double) ((Route) edge).getDistance();
             edge.setAttribute("distance", d);
         }
         Dijkstra dij = djikstra(origine, "distance");
-        dij.clear();
-        return dij.getPath(destination) ;
+        chemin = dij.getPath(destination) ;
+        dij.clear() ;
+        return chemin ;
     }
     public Path dijkstraEstimation(CentreSante origine, CentreSante destination) {
+        Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
             if (((Route) edge).getFiabilite() >= 0.25) {
                 double d = (double) ((Route) edge).calculeDureeEstimee();
@@ -140,7 +143,9 @@ public class Carte extends SingleGraph {
             }
         }
         Dijkstra dij = djikstra(origine, "dureeEstimee");
-        return dij.getPath(destination) ;
+        chemin = dij.getPath(destination) ;
+        dij.clear() ;
+        return chemin ;
     }
 //L'ordre est : duree | dureeEstimé | Distance
     public  ArrayList<ArrayList<Integer>> dijkstraInfos(CentreSante origine) {
@@ -168,6 +173,7 @@ public class Carte extends SingleGraph {
         }
         dijDu.clear();
         dijDi.clear();
+        dijEs.clear();
         return chemin ;
     }
 
