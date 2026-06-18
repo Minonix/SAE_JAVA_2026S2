@@ -46,6 +46,7 @@ public class MainWindow extends JFrame {
         super("NOM");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setPreferredSize(new Dimension(1920, 1080));
+        this.setMinimumSize(new Dimension(800, 600));
 
         Carte map = new Carte("5");
         map.ajouterCentre("S1", 'C');
@@ -387,7 +388,7 @@ public class MainWindow extends JFrame {
 
     private MyPanel initStatistique(Carte map) {
         if (pnlStatistique == null) {
-            pnlStatistique = new MyPanel(50, Color.PINK);
+            pnlStatistique = new MyPanel(50, Color.white);
             pnlStatistique.setLayout(new GridBagLayout());
 
             lbNbCentre = new JLabel();
@@ -409,6 +410,10 @@ public class MainWindow extends JFrame {
         lbNbCentre.setText("Centres de Nutrition : " + map.getNbNutri());
         lbNbMaternitee.setText("Maternités : " + map.getNbMat());
         lbNbOperatoire.setText("Blocs Opératoires : " + map.getNbBloc());
+
+        lbNbCentre.setForeground(Color.green);
+        lbNbMaternitee.setForeground(Color.blue);
+        lbNbOperatoire.setForeground(Color.red);
 
         return pnlStatistique;
     }
