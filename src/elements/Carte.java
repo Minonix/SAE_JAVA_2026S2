@@ -8,6 +8,7 @@ import org.graphstream.graph.implementations.SingleGraph;
 
 import com.opencsv.*;
 import com.opencsv.exceptions.CsvValidationException;
+import java.util.ArrayList;
 import java.io.FileNotFoundException;
 import org.graphstream.graph.implementations.SingleNode;
 
