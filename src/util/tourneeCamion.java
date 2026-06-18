@@ -6,7 +6,7 @@ import org.graphstream.graph.Path;
 
 import java.util.ArrayList;
 
-public class tourneeCamion {
+public class TourneeCamion {
 
     public static ArrayList<CentreSante> tourneeGlouton(Carte carte){
         ArrayList<CentreSante> solution = new ArrayList<CentreSante>();
