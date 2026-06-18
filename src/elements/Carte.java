@@ -30,12 +30,14 @@ public class Carte extends SingleGraph {
     private int nbBloc ;
     private int nbNutri ;
 
+    boolean routesCachees;
 
     public Carte(String id) {
         super(id);
         this.nbMat = 0;
         this.nbBloc = 0;
         this.nbNutri = 0;
+        this.routesCachees = false;
         this.setAttribute("ui.stylesheet","url('./assets/style/style.css')");
     }
 
@@ -326,6 +328,44 @@ public class Carte extends SingleGraph {
             if (((Route)e).getFiabilite() < seuil) {
                 e.setAttribute("ui.style", "fill-color: rgb("+color.getRed()+", "+color.getGreen()+", "+color.getBlue()+");");
             }
+        }
+    }
+
+    public void switchCacherRoutes() {
+        if (routesCachees) {
+            for (Edge e : this.getEdgeSet()) {
+                e.setAttribute("ui.style", "visibility-mode: normal;");
+            }
+        }
+        else {
+            for (Edge e : this.getEdgeSet()) {
+                e.setAttribute("ui.style", "visibility-mode: hidden;");
+            }
+        }
+        routesCachees = !routesCachees;
+    }
+
+    public void switchAffDistance() {
+        Route r;
+        for (Edge e : this.getEdgeSet()) {
+            r = (Route) e;
+            r.switchAffDistance();
+        }
+    }
+
+    public void switchAffDuree() {
+        Route r;
+        for (Edge e : this.getEdgeSet()) {
+            r = (Route) e;
+            r.switchAffDuree();
+        }
+    }
+
+    public void switchAffFiabilite() {
+        Route r;
+        for (Edge e : this.getEdgeSet()) {
+            r = (Route) e;
+            r.switchAffFiabilite();
         }
     }
 

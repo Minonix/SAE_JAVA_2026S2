@@ -4,6 +4,7 @@ import elements.CentreSante;
 import elements.Route;
 import elements.Carte;
 
+import org.graphstream.graph.Edge;
 import org.graphstream.ui.graphicGraph.GraphicElement;
 // import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.view.Viewer;
@@ -32,9 +33,11 @@ public class MainWindow extends JFrame {
 
     // menu
     JMenuBar bar;
-    JMenu mDistrict, mAffichage;
+    JMenu mDistrict, mAffichage, smCentre, smRoute;
     JMenuItem miNouveau;
     JCheckBoxMenuItem mixAfficherId, mixAfficherNom, mixAfficherType;
+    JCheckBoxMenuItem mixAfficherDistance, mixAfficherDuree, mixAfficherFiabilite, mixCacherRoutes;
+
 
     ArrayList<Carte> secteurs;
 
@@ -73,15 +76,28 @@ public class MainWindow extends JFrame {
         bar = new JMenuBar();
         mDistrict = new JMenu("District");
         mAffichage = new JMenu("Affichage");
+        smCentre = new JMenu("Centres");
+        smRoute = new JMenu("Routes");
         miNouveau = new JMenuItem("Nouveau...");
-        mixAfficherId = new JCheckBoxMenuItem("IDs des centres");
-        mixAfficherNom = new JCheckBoxMenuItem("Noms des centres");
-        mixAfficherType = new JCheckBoxMenuItem("Types des centres");
+        mixAfficherId = new JCheckBoxMenuItem("IDs");
+        mixAfficherNom = new JCheckBoxMenuItem("Noms");
+        mixAfficherType = new JCheckBoxMenuItem("Types");
+        mixAfficherDistance = new JCheckBoxMenuItem("Longueur/Distance");
+        mixAfficherDuree = new JCheckBoxMenuItem("Durée de parcours");
+        mixAfficherFiabilite = new JCheckBoxMenuItem("Fiabilité");
+        mixCacherRoutes = new JCheckBoxMenuItem("Cacher les routes");
 
         mDistrict.add(miNouveau);
-        mAffichage.add(mixAfficherId);
-        mAffichage.add(mixAfficherNom);
-        mAffichage.add(mixAfficherType);
+        mAffichage.add(smCentre);
+        smCentre.add(mixAfficherId);
+        smCentre.add(mixAfficherNom);
+        smCentre.add(mixAfficherType);
+
+        mAffichage.add(smRoute);
+        smRoute.add(mixCacherRoutes);
+        smRoute.add(mixAfficherDistance);
+        smRoute.add(mixAfficherDuree);
+        smRoute.add(mixAfficherFiabilite);
 
         mixAfficherNom.setSelected(true);
         mixAfficherType.setSelected(true);
@@ -526,6 +542,30 @@ public class MainWindow extends JFrame {
         mixAfficherType.addActionListener(e -> {
             for (Carte secteur : secteurs) {
                 secteur.switchAffTypes();
+            }
+        });
+
+        mixCacherRoutes.addActionListener(e -> {
+            for (Carte secteur : secteurs) {
+                secteur.switchCacherRoutes();
+            }
+        });
+
+        mixAfficherDistance.addActionListener(e -> {
+            for (Carte secteur : secteurs) {
+                secteur.switchAffDistance();
+            }
+        });
+
+        mixAfficherDuree.addActionListener(e -> {
+            for (Carte secteur : secteurs) {
+                secteur.switchAffDuree();
+            }
+        });
+
+        mixAfficherFiabilite.addActionListener(e -> {
+            for (Carte secteur : secteurs) {
+                secteur.switchAffFiabilite();
             }
         });
     }

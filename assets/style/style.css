@@ -1,11 +1,12 @@
 node {
-    shape: diamond;
-    size: 20px;
+    size: 15px;
+    text-size: 15;
+    text-alignment: above;
 }
 
 edge {
-    shape: cubic-curve;
-    stroke-width: 4px;
-    stroke-mode: plain;
-    stroke-color: black;
+    text-size: 13;
+    fill-color: black;
+    size: 1px;
+    text-alignment: along;
 }
