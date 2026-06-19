@@ -58,7 +58,7 @@ public class Carte extends SingleGraph {
     }
 
     public void ajouterCentre(String nomCentre, char centerType) {
-        cTmp = new CentreSante(this, getNbTotalCentres()+"", nomCentre, getNbTotalCentres(), centerType);
+        cTmp = new CentreSante(this, (getNbTotalCentres()+1)+"", nomCentre, getNbTotalCentres()+1, centerType);
         super.addNodeCallback(cTmp);
         if (centerType == 'O') nbBloc++;
         else if (centerType == 'N') nbNutri++;
@@ -72,8 +72,8 @@ public class Carte extends SingleGraph {
         } else {
             strTmp = b +"-" + a;
         }
-        CentreSante nodeA = (CentreSante) this.getNode(""+a);
-        CentreSante nodeB = (CentreSante) this.getNode(""+b);
+        CentreSante nodeA = (CentreSante) this.getNode(""+(a+1));
+        CentreSante nodeB = (CentreSante) this.getNode(""+(b+1));
 
         rTmp = new Route(strTmp, nodeA, nodeB, fiabilite, distance, duree);
         super.addEdgeCallback(rTmp);
@@ -201,13 +201,13 @@ public class Carte extends SingleGraph {
         for (int i=0 ; i< nbSommets ; i++){
             proba_centre = alea.nextInt(5);
             if (proba_centre < 3){
-                graph.ajouterCentre("" + i, 'M');
+                graph.ajouterCentre("S" + (i+1), 'M');
             }
             else if (proba_centre == 3){
-                graph.ajouterCentre("" + i, 'O');
+                graph.ajouterCentre("S" + (i+1), 'O');
             }
             else {
-                graph.ajouterCentre("" + i, 'N');
+                graph.ajouterCentre("S" + (i+1), 'N');
             }
         }
         for (int i=0; i< nbSommets; i++){

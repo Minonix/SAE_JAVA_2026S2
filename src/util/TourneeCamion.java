@@ -21,7 +21,7 @@ public class TourneeCamion {
             int min = -1;
             int imin = -1;
             for (int i = 0; i < infoD.size(); i++) {
-                if ((min > infoD.get(i).get(0) || min == -1) && !solution.contains(carte.getCentre(i)) && i != centreCourant.getIdCentre()) {
+                if ((min > infoD.get(i).get(0) || min == -1) && !solution.contains(carte.getCentre(i)) && i != centreCourant.getIdCentre()-1) {
                     min = infoD.get(i).get(0);
                     imin = i;
                 }
@@ -66,7 +66,7 @@ public class TourneeCamion {
             int min = -1;
             int imin = -1;
             for (int i = 0; i < infoD.size(); i++) {
-                if ((min > infoD.get(i).get(0) || min == -1) && !pass.contains(carte.getCentre(i)) && i != centreCourant.getIdCentre()) {
+                if ((min > infoD.get(i).get(0) || min == -1) && !pass.contains(carte.getCentre(i)) && i != centreCourant.getIdCentre()-1) {
                     min = infoD.get(i).get(0);
                     imin = i;
                 }
@@ -92,11 +92,11 @@ public class TourneeCamion {
     public static int getDuree(Carte g, ArrayList<CentreSante> t){
         int duree = 0 ;
         for (int i=0 ; i < t.size()-1; i++){
-            if ((g.getRoute(t.get(i).getIdCentre(), t.get(i+1).getIdCentre()) != null)) {
-                duree += (g.getRoute(t.get(i).getIdCentre(), t.get(i + 1).getIdCentre())).getDuree();
+            if ((g.getRoute(t.get(i).getIdCentre()-1, t.get(i+1).getIdCentre()-1) != null)) {
+                duree += (g.getRoute(t.get(i).getIdCentre()-1, t.get(i + 1).getIdCentre()-1)).getDuree();
             }
             else{
-                duree +=  g.dijkstraInfos(t.get(i)).get(t.get(i+1).getIdCentre()).get(0);
+                duree +=  g.dijkstraInfos(t.get(i)).get(t.get(i+1).getIdCentre()-1).getFirst();
             }
         }
         return duree ;
@@ -118,7 +118,7 @@ public class TourneeCamion {
             int min1 = -1;
             int imin1 = -1;
             for (int i = 0; i < infoD.size(); i++) {
-                if ((min1 > infoD.get(i).get(0) || min1 == -1) && !solutionC1.contains(carte.getCentre(i)) && !solutionC2.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()) {
+                if ((min1 > infoD.get(i).get(0) || min1 == -1) && !solutionC1.contains(carte.getCentre(i)) && !solutionC2.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()-1) {
                     min1 = infoD.get(i).get(0);
                     imin1 = i;
                 }
@@ -126,7 +126,7 @@ public class TourneeCamion {
             int min2 = -1;
             int imin2 = -1;
             for (int i = 0; i < infoD.size(); i++) {
-                if ((min2 > infoD.get(i).get(0) || min2 == -1) && i != imin1 && !solutionC1.contains(carte.getCentre(i)) && !solutionC2.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()) {
+                if ((min2 > infoD.get(i).get(0) || min2 == -1) && i != imin1 && !solutionC1.contains(carte.getCentre(i)) && !solutionC2.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()-1) {
                     min2 = infoD.get(i).get(0);
                     imin2 = i;
                 }

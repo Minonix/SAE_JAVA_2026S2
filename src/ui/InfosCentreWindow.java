@@ -120,11 +120,11 @@ public class InfosCentreWindow extends JFrame{
             gc.gridx = 1;
 
             tmp = plusProcheCentre(lsts.get(i));
-            pnlPlusProches.add(new JLabel(""+tmp.getIdCentre()), gc);
+            pnlPlusProches.add(new JLabel(""+(tmp.getIdCentre())), gc);
             gc.gridx++;
-            pnlPlusProches.add(new JLabel(""+allData.get(tmp.getIdCentre()).get(0)), gc);
+            pnlPlusProches.add(new JLabel(""+allData.get(tmp.getIdCentre()-1).get(0)), gc);
             gc.gridx++;
-            pnlPlusProches.add(new JLabel(""+allData.get(tmp.getIdCentre()).get(1)), gc);
+            pnlPlusProches.add(new JLabel(""+allData.get(tmp.getIdCentre()-1).get(1)), gc);
 
             gc.gridy++;
 
@@ -171,10 +171,10 @@ public class InfosCentreWindow extends JFrame{
             gc.gridx = 1;
 
             for (CentreSante centreType : lstCentresTypes.get(i)) {
-                pnlDistance.add(new JLabel(""+centreType.getIdCentre()), gc);
+                pnlDistance.add(new JLabel(""+(centreType.getIdCentre())), gc);
                 gc.gridx++;
 
-                pnlDistance.add(new JLabel("" + allData.get(centreType.getIdCentre()).get(2)), gc);
+                pnlDistance.add(new JLabel("" + allData.get(centreType.getIdCentre()-1).get(2)), gc);
                 gc.gridx = 1;
                 gc.gridy++;
             }
@@ -202,10 +202,10 @@ public class InfosCentreWindow extends JFrame{
             gc.gridx = 1;
 
             for (CentreSante centreType : lstCentresTypes.get(i)) {
-                pnlDuree.add(new JLabel(""+centreType.getIdCentre()), gc);
+                pnlDuree.add(new JLabel(""+(centreType.getIdCentre())), gc);
                 gc.gridx++;
 
-                pnlDuree.add(new JLabel("" + allData.get(centreType.getIdCentre()).getFirst()), gc);
+                pnlDuree.add(new JLabel("" + allData.get(centreType.getIdCentre()-1).getFirst()), gc);
                 gc.gridx = 1;
                 gc.gridy++;
             }
@@ -218,11 +218,11 @@ public class InfosCentreWindow extends JFrame{
 
     private CentreSante plusProcheCentre(ArrayList<CentreSante> liste) {
         CentreSante res = liste.getFirst();
-        int dureeEstimeeMax = allData.get(res.getIdCentre()).get(1);
+        int dureeEstimeeMax = allData.get(res.getIdCentre()-1).get(1);
 
         for (CentreSante centre : liste) {
-            if (allData.get(centre.getIdCentre()).get(1) < dureeEstimeeMax) {
-                dureeEstimeeMax = allData.get(centre.getIdCentre()).get(1);
+            if (allData.get(centre.getIdCentre()-1).get(1) < dureeEstimeeMax) {
+                dureeEstimeeMax = allData.get(centre.getIdCentre()-1).get(1);
                 res = centre;
             }
         }
