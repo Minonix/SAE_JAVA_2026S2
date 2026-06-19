@@ -311,15 +311,24 @@ public class Carte extends SingleGraph {
     }
 
     public void resetCouleursRoutes() {
+        String visibility = "";
+        if (routesCachees) {
+            visibility = " visibility-mode: hidden;";
+        }
         for (Edge e : this.getEdgeSet()) {
-            e.setAttribute("ui.style", "fill-color: black;");
+
+            e.setAttribute("ui.style", "fill-color: black; size: 1;"+visibility);
         }
     }
 
     public void colorerChemin(Path chemin, Color color) {
-
+        String visibility = "";
+        if (routesCachees) {
+            visibility = " visibility-mode: normal;";
+        }
         for (Edge e : chemin.getEdgeSet()) {
-            e.setAttribute("ui.style", "fill-color: rgb("+color.getRed()+", "+color.getGreen()+", "+color.getBlue()+");");
+
+            e.setAttribute("ui.style", "fill-color: rgb("+color.getRed()+", "+color.getGreen()+", "+color.getBlue()+"); size: 3;"+visibility);
         }
     }
 
@@ -332,14 +341,30 @@ public class Carte extends SingleGraph {
     }
 
     public void switchCacherRoutes() {
+        String oldParams;
         if (routesCachees) {
             for (Edge e : this.getEdgeSet()) {
-                e.setAttribute("ui.style", "visibility-mode: normal;");
+                if (e.getAttribute("ui.style") == null) {
+                    oldParams = "";
+                }
+                else {
+                    oldParams = e.getAttribute("ui.style");
+                }
+                e.setAttribute("ui.style", oldParams+"visibility-mode: normal;");
             }
         }
         else {
             for (Edge e : this.getEdgeSet()) {
-                e.setAttribute("ui.style", "visibility-mode: hidden;");
+
+                if (e.getAttribute("ui.style") == null || !((String)e.getAttribute("ui.style")).contains("size: 3;")) {
+                    if (e.getAttribute("ui.style") == null) {
+                        oldParams = "";
+                    }
+                    else {
+                        oldParams = e.getAttribute("ui.style");
+                    }
+                    e.setAttribute("ui.style", oldParams+"visibility-mode: hidden;");
+                }
             }
         }
         routesCachees = !routesCachees;

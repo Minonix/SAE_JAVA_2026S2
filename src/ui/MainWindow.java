@@ -34,7 +34,7 @@ public class MainWindow extends JFrame {
 
     // menu
     JMenuBar bar;
-    JMenu mDistrict, mAffichage, smCentre, smRoute;
+    JMenu mSecteur, mAffichage, smCentre, smRoute;
     JMenuItem miNouveau;
     JCheckBoxMenuItem mixAfficherId, mixAfficherNom, mixAfficherType;
     JCheckBoxMenuItem mixAfficherDistance, mixAfficherDuree, mixAfficherFiabilite, mixCacherRoutes;
@@ -76,7 +76,7 @@ public class MainWindow extends JFrame {
 
     private void initMenu() {
         bar = new JMenuBar();
-        mDistrict = new JMenu("District");
+        mSecteur = new JMenu("Secteur");
         mAffichage = new JMenu("Affichage");
         smCentre = new JMenu("Centres");
         smRoute = new JMenu("Routes");
@@ -87,9 +87,9 @@ public class MainWindow extends JFrame {
         mixAfficherDistance = new JCheckBoxMenuItem("Longueur/Distance");
         mixAfficherDuree = new JCheckBoxMenuItem("Durée de parcours");
         mixAfficherFiabilite = new JCheckBoxMenuItem("Fiabilité");
-        mixCacherRoutes = new JCheckBoxMenuItem("Cacher les routes");
+        mixCacherRoutes = new JCheckBoxMenuItem("Cacher les routes hors trajet");
 
-        mDistrict.add(miNouveau);
+        mSecteur.add(miNouveau);
         mAffichage.add(smCentre);
         smCentre.add(mixAfficherId);
         smCentre.add(mixAfficherNom);
@@ -105,7 +105,7 @@ public class MainWindow extends JFrame {
         mixAfficherType.setSelected(true);
         mixAfficherId.setSelected(true);
 
-        bar.add(mDistrict);
+        bar.add(mSecteur);
         bar.add(mAffichage);
 
         this.setJMenuBar(bar);
@@ -115,7 +115,7 @@ public class MainWindow extends JFrame {
         this.getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints gc = new GridBagConstraints();
 
-        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.fill = GridBagConstraints.BOTH;
         gc.anchor = GridBagConstraints.CENTER;
 
         gc.weightx = 0.1;
@@ -136,12 +136,10 @@ public class MainWindow extends JFrame {
         gc.weighty = 0.3;
         this.getContentPane().add(initSelectTrajet(secteurs.get(cbSecteur.getSelectedIndex())), gc);
 
-        gc.fill = GridBagConstraints.NONE;
         gc.gridy = 5;
         gc.gridheight = 1;
         gc.weighty = 0.1;
         this.getContentPane().add(initBoxBtnTourne(), gc);
-        gc.fill = GridBagConstraints.BOTH;
 
         gc.weightx = 0.9;
         gc.gridx = 1;
@@ -166,7 +164,9 @@ public class MainWindow extends JFrame {
 
     private MyPanel initInfoBox(Object select) {
         if (pnlInfoBox == null) {
-            pnlInfoBox = new MyPanel(50, Color.blue);
+            pnlInfoBox = new MyPanel(0, new Color(0xededed));
+            pnlInfoBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+
             pnlInfoBox.setLayout(new GridBagLayout());
         } else {
             pnlInfoBox.removeAll();
@@ -230,8 +230,9 @@ public class MainWindow extends JFrame {
 
     private MyPanel initSelectTrajet(Carte carte) {
         if (pnlSelectTrajet == null) {
-            pnlSelectTrajet = new MyPanel(50, Color.GRAY);
+            pnlSelectTrajet = new MyPanel(0, new Color(0xededed));
             pnlSelectTrajet.setLayout(new GridBagLayout());
+            pnlSelectTrajet.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
             GridBagConstraints gc = new GridBagConstraints();
             gc.insets = new Insets(10, 0, 10, 10);
@@ -281,12 +282,13 @@ public class MainWindow extends JFrame {
 
     private MyPanel initFiltre() {
         if (pnlFiltre == null) {
-            pnlFiltre = new MyPanel(50, Color.GREEN);
+            pnlFiltre = new MyPanel(0, new Color(0xededed));
+            pnlFiltre.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
             pnlFiltre.setLayout(new GridBagLayout());
 
             lbSeuil = new JLabel("Seuil (unité entre 1 et 10) : ");
             lbChxSecteur = new JLabel("Secteur : ");
-            txSeuil = new JTextField(10);
+            txSeuil = new JTextField(6);
             cbSecteur = new JComboBox<>();
             btSeuil = new JButton("Valider");
 
@@ -295,15 +297,16 @@ public class MainWindow extends JFrame {
 
             gc.gridx = 0;
             gc.gridy = 0;
-            pnlFiltre.add(lbSeuil, gc);
-            gc.gridy = 2;
             pnlFiltre.add(lbChxSecteur, gc);
+            gc.gridy = 1;
+            pnlFiltre.add(lbSeuil, gc);
             gc.gridx = 1;
-            pnlFiltre.add(cbSecteur, gc);
             gc.gridy = 0;
+            pnlFiltre.add(cbSecteur, gc);
+            gc.gridy = 1;
             pnlFiltre.add(txSeuil, gc);
             gc.gridx = 0;
-            gc.gridy = 1;
+            gc.gridy = 2;
             gc.gridwidth = 2;
             pnlFiltre.add(btSeuil, gc);
         }
@@ -320,8 +323,10 @@ public class MainWindow extends JFrame {
     JButton btTourne;
 
     private MyPanel initBoxBtnTourne() {
-        pnlBoxBtnTourne = new MyPanel(50, Color.MAGENTA);
+        pnlBoxBtnTourne = new MyPanel(0, new Color(0xededed));
         pnlBoxBtnTourne.setLayout(new BorderLayout());
+        pnlBoxBtnTourne.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+
         // pnlBoxBtnTourne.setPreferredSize(new Dimension(30, 50));
 
         btTourne = new JButton("Créer une Tournée");
@@ -333,7 +338,7 @@ public class MainWindow extends JFrame {
 
     private MyPanel initMap(Carte map) {
         if (pnlMap == null) {
-            pnlMap = new MyPanel(0, Color.ORANGE);
+            pnlMap = new MyPanel(0, new Color(0xededed));
             pnlMap.setLayout(new BorderLayout());
         } else {
             pnlMap.removeAll();
@@ -388,7 +393,9 @@ public class MainWindow extends JFrame {
 
     private MyPanel initStatistique(Carte map) {
         if (pnlStatistique == null) {
-            pnlStatistique = new MyPanel(50, Color.white);
+            pnlStatistique = new MyPanel(0, Color.white);
+            pnlStatistique.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+
             pnlStatistique.setLayout(new GridBagLayout());
 
             lbNbCentre = new JLabel();
@@ -447,7 +454,7 @@ public class MainWindow extends JFrame {
             Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
             mapSelcetione.resetCouleursRoutes();
             mapSelcetione.colorerChemin(mapSelcetione.dijkstraDuree(mapSelcetione.getCentre(cbDep.getSelectedIndex()),
-                    mapSelcetione.getCentre(cbArr.getSelectedIndex())), Color.RED);
+                    mapSelcetione.getCentre(cbArr.getSelectedIndex())), Color.BLUE);
         });
 
         btnchercherEstimation.addActionListener((e) -> {
@@ -455,7 +462,7 @@ public class MainWindow extends JFrame {
             mapSelcetione.resetCouleursRoutes();
             mapSelcetione
                     .colorerChemin(mapSelcetione.dijkstraEstimation(mapSelcetione.getCentre(cbDep.getSelectedIndex()),
-                            mapSelcetione.getCentre(cbArr.getSelectedIndex())), Color.YELLOW);
+                            mapSelcetione.getCentre(cbArr.getSelectedIndex())), Color.GREEN);
         });
 
         btRetourNormal.addActionListener((e) -> {
@@ -488,6 +495,8 @@ public class MainWindow extends JFrame {
             secteurs.get(cbSecteur.getSelectedIndex()).resetCouleursRoutes();
             try {
                 seuil = Integer.parseInt(txSeuil.getText());
+                if (seuil < 0 || seuil > 10)
+                    throw new NumberFormatException();
             } catch (NumberFormatException err) {
                 JOptionPane.showMessageDialog(this,
                         "Entrée du seuil invalide", "Erreur",

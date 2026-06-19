@@ -2,6 +2,7 @@ node {
     size: 15px;
     text-size: 15;
     text-alignment: above;
+    stroke-width: 3;
 }
 
 edge {
@@ -9,4 +10,6 @@ edge {
     fill-color: black;
     size: 1px;
     text-alignment: along;
+    shape : cubic-curve;
+    text-background-mode: plain;
 }
