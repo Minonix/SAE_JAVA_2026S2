@@ -5,17 +5,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.opencsv.CSVWriter;
-import com.sun.source.tree.Tree;
 
 import elements.Carte;
 import elements.CentreSante;
-import elements.Route;
 import util.TourneeCamion;
 
 import java.io.File;
-import java.util.List;
-
-import org.graphstream.algorithm.measure.ChartConnectivityMeasure.ChartEdgeConnectivityMeasure;
 
 public class ExporteCSV {
 

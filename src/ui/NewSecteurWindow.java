@@ -82,9 +82,9 @@ public class NewSecteurWindow extends JDialog {
     }
 
     private void initListener() {
-        btRetour.addActionListener(e -> {
-            NewSecteurWindow.this.dispose();
-        });
+        btRetour.addActionListener(e ->
+                NewSecteurWindow.this.dispose()
+        );
 
         btAlea.addActionListener(e -> {
             if (!txNom.getText().isBlank()) {

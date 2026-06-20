@@ -96,10 +96,10 @@ public class InfosCentreWindow extends JFrame{
 
     private void initPlusProches() {
         pnlPlusProches = new JPanel(new GridBagLayout());
-        ArrayList<ArrayList<CentreSante>> lsts = new ArrayList<>();
-        lsts.add(centresM);
-        lsts.add(centresO);
-        lsts.add(centresN);
+        ArrayList<ArrayList<CentreSante>> lists = new ArrayList<>();
+        lists.add(centresM);
+        lists.add(centresO);
+        lists.add(centresN);
 
         CentreSante tmp;
 
@@ -119,7 +119,7 @@ public class InfosCentreWindow extends JFrame{
 
             gc.gridx = 1;
 
-            tmp = plusProcheCentre(lsts.get(i));
+            tmp = plusProcheCentre(lists.get(i));
             pnlPlusProches.add(new JLabel(""+(tmp.getIdCentre())), gc);
             gc.gridx++;
             pnlPlusProches.add(new JLabel(""+allData.get(tmp.getIdCentre()-1).get(0)), gc);

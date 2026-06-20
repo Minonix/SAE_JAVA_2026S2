@@ -3,7 +3,7 @@ package elements;
 import org.graphstream.graph.implementations.AbstractEdge;
 
 public class Route extends AbstractEdge {
-    private int fiabilite, distance, duree;
+    private final int fiabilite, distance, duree;
     private String affFiabilite, affDistance, affDuree;
 
     protected Route(String id, CentreSante source, CentreSante target, int fiabilite, int distance, int duree) {
@@ -32,18 +32,6 @@ public class Route extends AbstractEdge {
 
     public int getDuree() {
         return duree;
-    }
-
-    public void setFiabilite(int fiabilite) {
-        this.fiabilite = fiabilite;
-    }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
-    public void setDuree(int duree) {
-        this.duree = duree;
     }
 
     public int calculeDureeEstimee(){

@@ -51,14 +51,6 @@ public class CentreSante extends SingleNode {
         return centerType;
     }
 
-    public void setIdCentre(int idCentre) {
-        this.idCentre = idCentre;
-    }
-
-    public void setCenterType(char centerType) {
-        this.centerType = centerType;
-    }
-
     public void switchAffIdCentre() {
         if (affIdCentre.isEmpty()) affIdCentre = "ID: "+idCentre + "  ";
         else affIdCentre = "";

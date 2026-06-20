@@ -4,8 +4,8 @@ import java.awt.*;
 import javax.swing.*;
 
 public class MyPanel extends JPanel {
-    private int cornerRadius;
-    private Color backgroundColor;
+    private final int cornerRadius;
+    private final Color backgroundColor;
 
     // Constructeur
     public MyPanel(int radius, Color bgColor) {

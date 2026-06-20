@@ -5,17 +5,11 @@ import elements.Route;
 import util.TourneeCamion;
 import elements.Carte;
 
-import org.graphstream.graph.Edge;
 import org.graphstream.ui.graphicGraph.GraphicElement;
-// import org.graphstream.ui.swingViewer.DefaultView;
 import org.graphstream.ui.view.Viewer;
 import org.graphstream.ui.view.util.DefaultMouseManager;
 
 import Exception.NoChangeException;
-
-// import org.graphstream.ui.view.util.InteractiveElement;
-// import org.graphstream.graph.Node;
-// import org.graphstream.graph.Edge;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -29,8 +23,6 @@ public class MainWindow extends JFrame {
     // vue principale
     MyPanel pnlInfoBox, pnlSelectTrajet, pnlMap, pnlStatistique, pnlBoxBtnTourne, pnlFiltre;
     Viewer vwrCarte;
-    JButton btLogo;
-    JComboBox<String> cbSelectCarte;
 
     // menu
     JMenuBar bar;
@@ -351,7 +343,7 @@ public class MainWindow extends JFrame {
 
         vwrCarte.enableAutoLayout();
 
-        Component view = (Component) vwrCarte.addDefaultView(false);
+        Component view = vwrCarte.addDefaultView(false);
 
         vwrCarte.getDefaultView().setMouseManager(new DefaultMouseManager() {
 

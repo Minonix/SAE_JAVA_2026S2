@@ -10,21 +10,17 @@ import com.opencsv.*;
 import com.opencsv.exceptions.CsvValidationException;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;
-import org.graphstream.graph.implementations.SingleNode;
 
 import java.awt.*;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
 
 
 public class Carte extends SingleGraph {
-    private Route rTmp;
-    private CentreSante cTmp;
 
     private int nbMat ;
     private int nbBloc ;
@@ -58,7 +54,7 @@ public class Carte extends SingleGraph {
     }
 
     public void ajouterCentre(String nomCentre, char centerType) {
-        cTmp = new CentreSante(this, (getNbTotalCentres()+1)+"", nomCentre, getNbTotalCentres()+1, centerType);
+        CentreSante cTmp = new CentreSante(this, (getNbTotalCentres() + 1) + "", nomCentre, getNbTotalCentres() + 1, centerType);
         super.addNodeCallback(cTmp);
         if (centerType == 'O') nbBloc++;
         else if (centerType == 'N') nbNutri++;
@@ -72,10 +68,10 @@ public class Carte extends SingleGraph {
         } else {
             strTmp = b +"-" + a;
         }
-        CentreSante nodeA = (CentreSante) this.getNode(""+(a+1));
-        CentreSante nodeB = (CentreSante) this.getNode(""+(b+1));
+        CentreSante nodeA = this.getNode(""+(a+1));
+        CentreSante nodeB = this.getNode(""+(b+1));
 
-        rTmp = new Route(strTmp, nodeA, nodeB, fiabilite, distance, duree);
+        Route rTmp = new Route(strTmp, nodeA, nodeB, fiabilite, distance, duree);
         super.addEdgeCallback(rTmp);
 
         try {
@@ -116,11 +112,11 @@ public class Carte extends SingleGraph {
         Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
             if (edge instanceof Route) {
-                double d = (double) ((Route) edge).getDuree();
+                double d = ((Route) edge).getDuree();
                 edge.setAttribute("duree", d);
             }
         }
-        Dijkstra dij = djikstra(origine, "duree");
+        Dijkstra dij = dijkstra(origine, "duree");
         chemin = dij.getPath(destination) ;
         dij.clear();
         return chemin ;
@@ -129,10 +125,10 @@ public class Carte extends SingleGraph {
     public Path dijkstraDistance(CentreSante origine, CentreSante destination) {
         Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
-            double d = (double) ((Route) edge).getDistance();
+            double d = ((Route) edge).getDistance();
             edge.setAttribute("distance", d);
         }
-        Dijkstra dij = djikstra(origine, "distance");
+        Dijkstra dij = dijkstra(origine, "distance");
         chemin = dij.getPath(destination) ;
         dij.clear() ;
         return chemin ;
@@ -141,34 +137,34 @@ public class Carte extends SingleGraph {
         Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
             if (((Route) edge).getFiabilite() >= 0.25) {
-                double d = (double) ((Route) edge).calculeDureeEstimee();
+                double d = ((Route) edge).calculeDureeEstimee();
                 edge.setAttribute("dureeEstimee", d);
             }
         }
-        Dijkstra dij = djikstra(origine, "dureeEstimee");
+        Dijkstra dij = dijkstra(origine, "dureeEstimee");
         chemin = dij.getPath(destination) ;
         dij.clear() ;
         return chemin ;
     }
 //L'ordre est : duree | dureeEstimé | Distance
     public  ArrayList<ArrayList<Integer>> dijkstraInfos(CentreSante origine) {
-        ArrayList<ArrayList<Integer>> chemin = new  ArrayList<ArrayList<Integer>>() ;
+        ArrayList<ArrayList<Integer>> chemin = new  ArrayList<>() ;
         for (Edge edge : this.getEdgeSet()) {
-            double d = (double) ((Route) edge).getDuree();
-            double di = (double) ((Route) edge).getDistance();
+            double d = ((Route) edge).getDuree();
+            double di = ((Route) edge).getDistance();
             edge.setAttribute("duree", d);
             edge.setAttribute("distance", di);
             if (((Route) edge).getFiabilite() >= 0.25) {
-                double e = (double) ((Route) edge).calculeDureeEstimee();
+                double e = ((Route) edge).calculeDureeEstimee();
                 edge.setAttribute("dureeEstimee", e);
             }
         }
-        Dijkstra dijDu = djikstra(origine, "duree");
-        Dijkstra dijDi = djikstra(origine, "distance");
-        Dijkstra dijEs = djikstra(origine, "dureeEstimee");
+        Dijkstra dijDu = dijkstra(origine, "duree");
+        Dijkstra dijDi = dijkstra(origine, "distance");
+        Dijkstra dijEs = dijkstra(origine, "dureeEstimee");
 
         for (Node t : this.getNodeSet()){
-            ArrayList<Integer> temp = new ArrayList<Integer>();
+            ArrayList<Integer> temp = new ArrayList<>();
             temp.add((int)dijDu.getPathLength(t));
             temp.add((int)dijEs.getPathLength(t));
             temp.add((int)dijDi.getPathLength(t));
@@ -180,7 +176,7 @@ public class Carte extends SingleGraph {
         return chemin ;
     }
 
-    private Dijkstra djikstra(CentreSante origine, String attibut){
+    private Dijkstra dijkstra(CentreSante origine, String attibut){
         Dijkstra dij = new Dijkstra(Dijkstra.Element.EDGE, null, attibut);
         dij.init(this);
         dij.setSource(origine);
