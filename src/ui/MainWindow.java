@@ -464,22 +464,22 @@ public class MainWindow extends JFrame {
 
         btTourne.addActionListener((e) -> {
             Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-            Object[] choix = {1, 2, "Retour"};
-            int rep = JOptionPane.showOptionDialog(this, "Choisir le nombre de camion",
-            "Choix nombre de camion", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, choix, choix[0]);
-            switch (rep) {
-                //TODO: ajoute une boite de dialogue pour donnée la durée
-                case 0 -> {
-                    ArrayList<CentreSante> res1c = TourneeCamion.tourneeGlouton(mapSelcetione);
-                    ExporteCSV.ExporteCSV1c(res1c, mapSelcetione, (String) cbSecteur.getSelectedItem());
+            try {
+                ArrayList<Object> params = NewTourneeWindow.newTournee();
+                if ((Integer) params.getFirst() == 1) {
+                    if (params.getLast() != null)
+                        TourneeCamion.tourneeGlouton(mapSelcetione,(Character) params.getLast());
+                    else
+                        TourneeCamion.tourneeGlouton(mapSelcetione);
                 }
-                case 1 -> {
-                    ArrayList<CentreSante>[] res2c = TourneeCamion.tourneeGlouton2C(mapSelcetione);
-                    ExporteCSV.ExporteCSV2c(res2c, mapSelcetione, (String) cbSecteur.getSelectedItem());
+                else {
+                    if (params.getLast() != null)
+                        // TourneeCamion.tourneeGlouton2C(mapSelcetione,(Character) params.getLast());
+                        System.out.println("TO BE IMPLEMENTED");
+                    else
+                        TourneeCamion.tourneeGlouton2C(mapSelcetione);
                 }
-                case 2 -> {}
-                default -> JOptionPane.showMessageDialog(this, "Erreur = retour incorrecte");
-            }
+            } catch (NoChangeException ignored){}
         });
 
         btSeuil.addActionListener((e) -> {
