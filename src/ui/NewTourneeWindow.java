@@ -69,6 +69,7 @@ public class NewTourneeWindow extends JDialog {
         GridBagConstraints gc = new GridBagConstraints();
 
         gc.insets = new Insets(5, 2, 5, 2);
+        gc.fill = GridBagConstraints.HORIZONTAL;
         gc.gridx = gc.gridy = 0;
         mainPanel.add(lbNbCamions, gc);
         gc.gridx++;

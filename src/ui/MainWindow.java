@@ -467,17 +467,26 @@ public class MainWindow extends JFrame {
             try {
                 ArrayList<Object> params = NewTourneeWindow.newTournee();
                 if ((Integer) params.getFirst() == 1) {
+                    ArrayList<CentreSante> resultTournee;
+
                     if (params.getLast() != null)
-                        TourneeCamion.tourneeGlouton(mapSelcetione,(Character) params.getLast());
+                        resultTournee = TourneeCamion.tourneeGlouton(mapSelcetione,(Character) params.getLast());
                     else
-                        TourneeCamion.tourneeGlouton(mapSelcetione);
+                        resultTournee = TourneeCamion.tourneeGlouton(mapSelcetione);
+
+                    ExporteCSV.ExporteCSV1c(resultTournee, mapSelcetione, (String) cbSecteur.getSelectedItem());
                 }
                 else {
+                    ArrayList<CentreSante>[] resultTournee;
+
                     if (params.getLast() != null)
                         // TourneeCamion.tourneeGlouton2C(mapSelcetione,(Character) params.getLast());
                         System.out.println("TO BE IMPLEMENTED");
-                    else
-                        TourneeCamion.tourneeGlouton2C(mapSelcetione);
+
+                    else {
+                        resultTournee = TourneeCamion.tourneeGlouton2C(mapSelcetione);
+                        ExporteCSV.ExporteCSV2c(resultTournee, mapSelcetione, (String) cbSecteur.getSelectedItem());
+                    }
                 }
             } catch (NoChangeException ignored){}
         });
@@ -504,7 +513,7 @@ public class MainWindow extends JFrame {
                 secteurs.add(nCarte);
                 cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
                 cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
-            } catch (NoChangeException e1) {} //TODO: 
+            } catch (NoChangeException ignored) {}
         });
 
         mixAfficherId.addActionListener(e -> {
