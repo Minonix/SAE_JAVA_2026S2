@@ -317,6 +317,15 @@ public class Carte extends SingleGraph {
         }
     }
 
+    public void resetCouleurRoute(Route r) {
+        String visibility = "";
+        if (routesCachees) {
+            visibility = " visibility-mode: hidden;";
+        }
+        
+        r.setAttribute("ui.style", "fill-color: black; size: 1;" + visibility);
+    }
+
     public void colorerChemin(Path chemin, Color color) {
         String visibility = "";
         if (routesCachees) {

@@ -16,12 +16,13 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.io.FileNotFoundException;
+import java.util.Iterator;
 
 import javax.swing.*;
 
 public class MainWindow extends JFrame {
     // vue principale
-    MyPanel pnlInfoBox, pnlSelectTrajet, pnlMap, pnlStatistique, pnlBoxBtnTourne, pnlFiltre;
+    MyPanel pnlInfoBox, pnlInfoBoxSec, pnlSelectTrajet, pnlMap, pnlStatistique, pnlBoxBtnTourne, pnlFiltre;
     Viewer vwrCarte;
 
     // menu
@@ -30,7 +31,6 @@ public class MainWindow extends JFrame {
     JMenuItem miNouveau;
     JCheckBoxMenuItem mixAfficherId, mixAfficherNom, mixAfficherType;
     JCheckBoxMenuItem mixAfficherDistance, mixAfficherDuree, mixAfficherFiabilite, mixCacherRoutes;
-
 
     ArrayList<Carte> secteurs;
 
@@ -152,16 +152,24 @@ public class MainWindow extends JFrame {
         this.pack();
     }
 
-    JLabel titreInfoBox, info1, info2, info3;
+    JLabel titreInfoBox, infoCentre1, infoCentre2, SoustitreInfoBox, infoRoute1, infoRoute2, infoRoute3;
+    JComboBox<String> cbRoutes;
+    ArrayList<Route> listRoute;
+    Route routeMiseEnEvidence = null;
 
     private MyPanel initInfoBox(Object select) {
         if (pnlInfoBox == null) {
             pnlInfoBox = new MyPanel(0, new Color(0xededed));
             pnlInfoBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
+            cbRoutes = new JComboBox<>();
+            listRoute = new ArrayList<>();
+
             pnlInfoBox.setLayout(new GridBagLayout());
         } else {
             pnlInfoBox.removeAll();
+            cbRoutes.removeAllItems();
+            listRoute.clear();
         }
         GridBagConstraints gc = new GridBagConstraints();
         Insets inset = new Insets(10, 0, 0, 0);
@@ -169,51 +177,101 @@ public class MainWindow extends JFrame {
         gc.gridx = 0;
         gc.gridy = 0;
 
-        if (select == null) {
-            titreInfoBox = new JLabel("Aucun élément Sélectionner");
+        if (select instanceof CentreSante centreSante) {
+            titreInfoBox = new JLabel("Centre");
+            infoCentre1 = new JLabel("Id : " + centreSante.getIdCentre());
+            infoCentre2 = new JLabel("Nom : " + centreSante.getNomCentre());
 
+            inset.set(10, 0, 10, 0);
             pnlInfoBox.add(titreInfoBox, gc);
-        } else {
-            switch (select) {
-                case CentreSante centreSante -> {
-                    titreInfoBox = new JLabel("Centre");
-                    info1 = new JLabel("Id : " + centreSante.getIdCentre());
-                    info2 = new JLabel("Nom : " + centreSante.getNomCentre());
+            gc.gridy = 1;
+            inset.set(0, 0, 5, 0);
+            pnlInfoBox.add(infoCentre1, gc);
+            gc.gridy = 2;
+            pnlInfoBox.add(infoCentre2, gc);
 
-                    inset.set(10, 0, 10, 0);
-                    pnlInfoBox.add(titreInfoBox, gc);
-                    gc.gridy = 1;
-                    inset.set(0, 0, 5, 0);
-                    pnlInfoBox.add(info1, gc);
-                    gc.gridy = 2;
-                    pnlInfoBox.add(info2, gc);
-                }
-                case Route route -> {
-                    titreInfoBox = new JLabel("Route");
-                    info1 = new JLabel("Fiabilité : " + route.getFiabilite());
-                    info2 = new JLabel("Distance : " + route.getDistance());
-                    info3 = new JLabel("Durée : " + route.getDuree());
+            Iterator<org.graphstream.graph.Edge> it = centreSante.getEdgeIterator();
 
-                    pnlInfoBox.add(titreInfoBox, gc);
-                    gc.gridy = 1;
-                    pnlInfoBox.add(info1, gc);
-                    gc.gridy = 2;
-                    pnlInfoBox.add(info2, gc);
-                    gc.gridy = 3;
-                    pnlInfoBox.add(info3, gc);
-                }
-                default -> {
-                    titreInfoBox = new JLabel("Aucun élément Sélectionner");
+            cbRoutes.addItem("Selectionner une route");
+            while (it.hasNext()) {
+                Route route = (Route) it.next();
 
-                    pnlInfoBox.add(titreInfoBox, gc);
+                CentreSante centreOppose;
+                if (route.getSource().getIdCentre() == centreSante.getIdCentre()) {
+                    centreOppose = route.getTarget();
+                } else {
+                    centreOppose = route.getSource();
                 }
+
+                listRoute.add(route);
+                cbRoutes.addItem("Vers " + centreOppose.getNomCentre());
             }
+
+            gc.gridy = 3;
+            pnlInfoBox.add(cbRoutes, gc);
+
+            gc.gridy = 4;
+            gc.gridwidth = 1;
+            gc.gridheight = 4;
+
+            if (cbRoutes.getItemCount() <= 1) {
+                cbRoutes.removeAllItems();
+                cbRoutes.addItem("Aucune route");
+                cbRoutes.setEnabled(false);
+            } else {
+                cbRoutes.setEnabled(true);
+            }
+
+            MyPanel sousPanel = initInfoBoxSec(null);
+            pnlInfoBox.add(sousPanel, gc);
+
+        } else {
+            titreInfoBox = new JLabel("Aucun élément Sélectionner");
+            pnlInfoBox.add(titreInfoBox, gc);
         }
 
         pnlInfoBox.revalidate();
         pnlInfoBox.repaint();
         return pnlInfoBox;
+    }
 
+    private MyPanel initInfoBoxSec(Route route) {
+        if (pnlInfoBoxSec == null) {
+            pnlInfoBoxSec = new MyPanel(50, new Color(0xededef)); // TODO: trouver une sous couleur
+            pnlInfoBoxSec.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+
+            pnlInfoBoxSec.setLayout(new GridBagLayout());
+        } else {
+            pnlInfoBoxSec.removeAll();
+        }
+
+        GridBagConstraints gc = new GridBagConstraints();
+        Insets inset = new Insets(10, 20, 0, 20);
+        gc.insets = inset;
+        gc.gridx = 0;
+        gc.gridy = 0;
+
+        if (route != null) {
+            SoustitreInfoBox = new JLabel("Route");
+            infoRoute1 = new JLabel("Fiabilité : " + route.getFiabilite());
+            infoRoute2 = new JLabel("Distance : " + route.getDistance());
+            infoRoute3 = new JLabel("Durée : " + route.getDuree());
+
+            pnlInfoBoxSec.add(SoustitreInfoBox, gc);
+            gc.gridy = 1;
+            pnlInfoBoxSec.add(infoRoute1, gc);
+            gc.gridy = 2;
+            pnlInfoBoxSec.add(infoRoute2, gc);
+            gc.gridy = 3;
+            pnlInfoBoxSec.add(infoRoute3, gc);
+        } else {
+            SoustitreInfoBox = new JLabel("Aucune route");
+            pnlInfoBoxSec.add(SoustitreInfoBox, gc);
+        }
+
+        pnlInfoBoxSec.revalidate();
+        pnlInfoBoxSec.repaint();
+        return pnlInfoBoxSec;
     }
 
     JLabel depLab, arrLab;
@@ -366,7 +424,7 @@ public class MainWindow extends JFrame {
                     String idSommet = element.getId();
                     Object n = mapSelcetione.getCentre(idSommet);
                     if (SwingUtilities.isRightMouseButton(e)) {
-                        new InfosCentreWindow((CentreSante)n);
+                        new InfosCentreWindow((CentreSante) n);
                     } else {
                         initInfoBox(n);
                     }
@@ -437,7 +495,6 @@ public class MainWindow extends JFrame {
             initMap(mapSelectionnee);
             initStatistique(mapSelectionnee);
 
-            // initInfoBox(mapSelectionnee.getCentre(0));
             initInfoBox(null);
             initSelectTrajet(mapSelectionnee);
         });
@@ -470,24 +527,25 @@ public class MainWindow extends JFrame {
                     ArrayList<CentreSante> resultTournee;
 
                     if (params.getLast() != null)
-                        resultTournee = TourneeCamion.tourneeGlouton(mapSelcetione,(Character) params.getLast());
+                        resultTournee = TourneeCamion.tourneeGlouton(mapSelcetione, (Character) params.getLast());
                     else
                         resultTournee = TourneeCamion.tourneeGlouton(mapSelcetione);
 
                     ExporteCSV.ExporteCSV1c(resultTournee, mapSelcetione, (String) cbSecteur.getSelectedItem());
-                }
-                else {
+                } else {
                     ArrayList<CentreSante>[] resultTournee;
 
                     if (params.getLast() != null)
-                        resultTournee = TourneeCamion.tourneeGlouton2C(mapSelcetione,(Character) params.getLast());
+                        resultTournee = TourneeCamion.tourneeGlouton2C(mapSelcetione, (Character) params.getLast());
                     else
                         resultTournee = TourneeCamion.tourneeGlouton2C(mapSelcetione);
 
                     ExporteCSV.ExporteCSV2c(resultTournee, mapSelcetione, (String) cbSecteur.getSelectedItem());
                 }
-                JOptionPane.showMessageDialog(this, "La tournée à bien été ajoutée, consultez votre répertoire courant.");
-            } catch (NoChangeException ignored){}
+                JOptionPane.showMessageDialog(this,
+                        "La tournée à bien été ajoutée, consultez votre répertoire courant.");
+            } catch (NoChangeException ignored) {
+            }
         });
 
         btSeuil.addActionListener((e) -> {
@@ -505,6 +563,25 @@ public class MainWindow extends JFrame {
             secteurs.get(cbSecteur.getSelectedIndex()).colorerSeuil(seuil, Color.RED);
         });
 
+        cbRoutes.addActionListener(e -> {
+            int indexSelectionne = cbRoutes.getSelectedIndex();
+            Carte mapSelectionnee = secteurs.get(cbSecteur.getSelectedIndex());
+
+            if (routeMiseEnEvidence != null) {
+                mapSelectionnee.resetCouleurRoute(routeMiseEnEvidence);
+                routeMiseEnEvidence = null;
+            }
+
+            if (indexSelectionne > 0 && (indexSelectionne - 1) < listRoute.size()) {
+                Route routeSelectionnee = listRoute.get(indexSelectionne - 1);
+                routeSelectionnee.setAttribute("ui.style", "fill-color: cyan; size: 4; visibility-mode: normal;");
+                routeMiseEnEvidence = routeSelectionnee;
+                initInfoBoxSec(routeSelectionnee);
+            } else {
+                initInfoBoxSec(null);
+            }
+        });
+
         miNouveau.addActionListener(e -> {
             Carte nCarte;
             try {
@@ -512,7 +589,8 @@ public class MainWindow extends JFrame {
                 secteurs.add(nCarte);
                 cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
                 cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
-            } catch (NoChangeException ignored) {}
+            } catch (NoChangeException ignored) {
+            }
         });
 
         mixAfficherId.addActionListener(e -> {

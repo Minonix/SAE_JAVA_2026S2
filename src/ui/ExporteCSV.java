@@ -14,8 +14,7 @@ import java.io.File;
 
 public class ExporteCSV {
 
-    public ExporteCSV() {
-    }
+    public ExporteCSV() {}
 
     public static void ExporteCSV1c(ArrayList<CentreSante> list, Carte carte, String nom) {
 

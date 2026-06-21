@@ -13,7 +13,7 @@ public class MyPanel extends JPanel {
         this.cornerRadius = radius;
         this.backgroundColor = bgColor;
         
-        // CRUCIAL : Indique à Swing de ne pas dessiner le fond carré par défaut
+        // Indique à Swing de ne pas dessiner le fond carré par défaut
         setOpaque(false); 
     }
 

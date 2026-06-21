@@ -5,13 +5,17 @@ import org.graphstream.graph.implementations.AbstractEdge;
 public class Route extends AbstractEdge {
     private final int fiabilite, distance, duree;
     private String affFiabilite, affDistance, affDuree;
+    private CentreSante source, target;
 
+    
     protected Route(String id, CentreSante source, CentreSante target, int fiabilite, int distance, int duree) {
         super(id, source, target, false);
+        this.source = source;
+        this.target = target;
         this.fiabilite = fiabilite;
         this.distance = distance;
         this.duree = duree;
-
+        
         this.affDistance = "";
         this.affFiabilite = "";
         this.affDuree = "";
@@ -22,6 +26,14 @@ public class Route extends AbstractEdge {
 
     }
 
+    public CentreSante getSource() {
+        return source;
+    }
+
+    public CentreSante getTarget() {
+        return target;
+    }
+    
     public int getFiabilite() {
         return fiabilite;
     }
