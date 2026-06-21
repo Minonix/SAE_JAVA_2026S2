@@ -17,6 +17,11 @@ import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileSystemView;
 
+/**
+ * Fenêtre de dialogue (JDialog) permettant à l'utilisateur de créer un nouveau secteur.
+ * L'utilisateur dispose de deux options : générer un graphe aléatoire (en spécifiant 
+ * un nom et un nombre de sommets) ou importer un graphe existant à partir d'un fichier CSV.
+ */
 public class NewSecteurWindow extends JDialog {
 
     private Carte carteCreee;
@@ -24,6 +29,11 @@ public class NewSecteurWindow extends JDialog {
     private JTextField txParam;
     private JButton btRetour, btAlea, btChemin;
 
+    /**
+     * Constructeur de la fenêtre de création de secteur.
+     * Configure les propriétés de la fenêtre (titre, taille, modalité) et initialise 
+     * les composants graphiques ainsi que leurs écouteurs d'événements.
+     */
     public NewSecteurWindow(){
         super();
         this.setTitle("Création d'un Nouveau Secteur");
@@ -37,6 +47,7 @@ public class NewSecteurWindow extends JDialog {
     }
 
     private void initComponent() {
+        // ... (Code conservé à l'identique)
         JPanel panelFormulaire = new JPanel(new GridBagLayout());
 
         JLabel lblNom = new JLabel("Nom du secteur :");
@@ -82,6 +93,7 @@ public class NewSecteurWindow extends JDialog {
     }
 
     private void initListener() {
+        // ... (Code conservé à l'identique)
         btRetour.addActionListener(e ->
                 NewSecteurWindow.this.dispose()
         );
@@ -91,7 +103,7 @@ public class NewSecteurWindow extends JDialog {
                 try {
                     int nbSommets = Integer.parseInt(txParam.getText().trim());
                     carteCreee = Carte.construireGrapheAleatoire(txNom.getText(), nbSommets);
-                    this.dispose(); // Ferme la fenêtre si tout s'est bien passé
+                    this.dispose(); 
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(this,
                             "Pour une génération aléatoire, veuillez entrer un nombre de sommets valide.", "Erreur",
@@ -142,6 +154,13 @@ public class NewSecteurWindow extends JDialog {
         });
     }
 
+    /**
+     * Ouvre la fenêtre de dialogue de création et bloque l'exécution du programme 
+     * appelant jusqu'à ce que l'utilisateur valide la création ou ferme la fenêtre.
+     *
+     * @return L'objet {@link Carte} nouvellement généré (aléatoirement ou par fichier CSV).
+     * @throws NoChangeException Si l'utilisateur annule l'opération ou ferme la fenêtre sans valider.
+     */
     public static Carte NewSecteur() throws NoChangeException{
         NewSecteurWindow nSect = new NewSecteurWindow();
         nSect.setVisible(true); // L'exécution du code s'arrête ici jusqu'au this.dispose()

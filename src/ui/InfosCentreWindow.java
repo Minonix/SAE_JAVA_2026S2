@@ -8,11 +8,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-
+/**
+ * Fenêtre secondaire (héritant de {@link JFrame}) affichant les informations détaillées 
+ * relatives à un centre de santé précis.
+ * Elle présente des onglets calculant, via l'algorithme de Dijkstra, les distances, 
+ * les durées de trajet et les durées estimées vers les autres centres du réseau, 
+ * en plus de mettre en évidence les centres les plus proches par catégorie.
+ */
 public class InfosCentreWindow extends JFrame{
     private final CentreSante c;
     private final Carte g;
 
+    /**
+     * Matrice bidimensionnelle contenant les métriques de trajet depuis le centre sélectionné vers tous 
+     * les autres nœuds du graphe, obtenues via Dijkstra.
+     * Pour chaque centre (identifié par son index), la liste interne contient 3 valeurs : 
+     * [0] Durée, [1] Durée estimée avec fiabilité, [2] Distance physique.
+     */
     public ArrayList<ArrayList<Integer>> allData;
 
     private ArrayList<CentreSante> centresM;
@@ -29,6 +41,14 @@ public class InfosCentreWindow extends JFrame{
     private JPanel pnlDistance;
     private JPanel pnlDuree;
 
+    /**
+     * Constructeur de la fenêtre d'informations pour un centre donné.
+     * Déclenche l'algorithme de calcul des plus courts chemins et prépare l'affichage 
+     * sous forme de listes classées par onglets.
+     *
+     * @param c Le {@link CentreSante} ciblé dont on souhaite consulter les statistiques 
+     * et les connexions dans le réseau.
+     */
     public InfosCentreWindow(CentreSante c) {
         super("Informations sur le centre");
         this.c = c;

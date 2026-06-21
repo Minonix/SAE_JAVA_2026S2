@@ -18,8 +18,13 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Random;
 
-
-
+/**
+ * Gère l'intégralité du réseau de santé (le graphe) pour un secteur donné.
+ * Hérite de {@link SingleGraph} de la bibliothèque GraphStream.
+ * Cette classe permet la manipulation des centres (noeuds) et routes (arêtes),
+ * l'importation de fichiers CSV, la génération aléatoire de réseau, 
+ * et la recherche de plus courts chemins à l'aide de l'algorithme de Dijkstra.
+ */
 public class Carte extends SingleGraph {
 
     private int nbMat ;
@@ -28,6 +33,12 @@ public class Carte extends SingleGraph {
 
     boolean routesCachees;
 
+    /**
+     * Constructeur de la carte.
+     * Initialise les statistiques des centres à zéro et charge la feuille de style par défaut.
+     *
+     * @param id L'identifiant unique textuel de ce graphe/secteur.
+     */
     public Carte(String id) {
         super(id);
         this.nbMat = 0;
@@ -37,22 +48,48 @@ public class Carte extends SingleGraph {
         this.setAttribute("ui.stylesheet","url('./assets/style/style.css')");
     }
 
+    /**
+     * Récupère le nombre total de centres de type "Maternité" présents sur la carte.
+     *
+     * @return Le nombre de maternités.
+     */
     public int getNbMat() {
         return nbMat;
     }
 
+    /**
+     * Récupère le nombre total de centres de type "Bloc opératoire" présents sur la carte.
+     *
+     * @return Le nombre de blocs opératoires.
+     */
     public int getNbBloc() {
         return nbBloc;
     }
 
+    /**
+     * Récupère le nombre total de centres de type "Centre de Nutrition" présents sur la carte.
+     *
+     * @return Le nombre de centres de nutrition.
+     */
     public int getNbNutri() {
         return nbNutri;
     }
 
+    /**
+     * Calcule et retourne le nombre total de centres de santé (tous types confondus) sur la carte.
+     *
+     * @return Le nombre total de centres.
+     */
     public int getNbTotalCentres() {
         return nbNutri+nbBloc+nbMat;
     }
 
+    /**
+     * Ajoute un nouveau centre de santé (nœud) au graphe et met à jour les statistiques globales.
+     *
+     * @param nomCentre  Le nom textuel du centre de santé.
+     * @param centerType Le caractère définissant le type ('M', 'O', ou 'N').
+     */
     public void ajouterCentre(String nomCentre, char centerType) {
         CentreSante cTmp = new CentreSante(this, (getNbTotalCentres() + 1) + "", nomCentre, getNbTotalCentres() + 1, centerType);
         super.addNodeCallback(cTmp);
@@ -61,6 +98,16 @@ public class Carte extends SingleGraph {
         else nbMat++;
     }
 
+    /**
+     * Ajoute une nouvelle route (arête) entre deux centres de santé existants.
+     * L'ID de la route est généré automatiquement en formatant les index (ex: "1-2").
+     *
+     * @param a         L'index du centre de départ (commençant à 0).
+     * @param b         L'index du centre d'arrivée (commençant à 0).
+     * @param fiabilite Le score de fiabilité de la route.
+     * @param distance  La distance physique de la route.
+     * @param duree     La durée de parcours de cette route.
+     */
     public void ajouterRoute(int a, int b, int fiabilite, int distance, int duree) {
         String strTmp;
         if (a < b) {
@@ -90,14 +137,34 @@ public class Carte extends SingleGraph {
         rTmp.setAttribute("duree", (double) duree);
     }
 
+    /**
+     * Récupère un centre de santé en fonction de son index dans le graphe.
+     *
+     * @param i L'index (position) du nœud.
+     * @return L'objet {@link CentreSante} correspondant.
+     */
     public CentreSante getCentre(int i) {
         return this.getNode(i);
     }
 
+    /**
+     * Récupère un centre de santé en fonction de son identifiant textuel.
+     *
+     * @param id L'identifiant (String) du nœud.
+     * @return L'objet {@link CentreSante} correspondant.
+     */
     public CentreSante getCentre(String id) {
         return this.getNode(id);
     }
 
+    /**
+     * Récupère une route spécifique entre deux centres de santé.
+     * Formate automatiquement la requête d'ID indépendamment du sens de la demande (A->B ou B->A).
+     *
+     * @param a L'identifiant du premier centre.
+     * @param b L'identifiant du second centre.
+     * @return L'objet {@link Route} reliant ces deux centres, ou null si elle n'existe pas.
+     */
     public Route getRoute(int a, int b) {
         String strTmp;
         if (a < b) {
@@ -108,6 +175,13 @@ public class Carte extends SingleGraph {
         return this.getEdge(strTmp);
     }
 
+    /**
+     * Calcule le plus court chemin entre deux centres en se basant sur la durée de parcours.
+     *
+     * @param origine     Le {@link CentreSante} de départ.
+     * @param destination Le {@link CentreSante} d'arrivée.
+     * @return Le chemin optimal ({@link Path}) minimisant la durée.
+     */
     public Path dijkstraDuree(CentreSante origine, CentreSante destination) {
         Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
@@ -122,6 +196,13 @@ public class Carte extends SingleGraph {
         return chemin ;
     }
 
+    /**
+     * Calcule le plus court chemin entre deux centres en se basant sur la distance géographique.
+     *
+     * @param origine     Le {@link CentreSante} de départ.
+     * @param destination Le {@link CentreSante} d'arrivée.
+     * @return Le chemin optimal ({@link Path}) minimisant la distance.
+     */
     public Path dijkstraDistance(CentreSante origine, CentreSante destination) {
         Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
@@ -133,6 +214,16 @@ public class Carte extends SingleGraph {
         dij.clear() ;
         return chemin ;
     }
+
+    /**
+     * Calcule le plus court chemin entre deux centres en se basant sur la durée de parcours estimée
+     * (durée pondérée par la fiabilité de la route). Ne prend en compte que les routes ayant
+     * une fiabilité minimale de 0.25.
+     *
+     * @param origine     Le {@link CentreSante} de départ.
+     * @param destination Le {@link CentreSante} d'arrivée.
+     * @return Le chemin optimal ({@link Path}) minimisant la durée estimée.
+     */
     public Path dijkstraEstimation(CentreSante origine, CentreSante destination) {
         Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
@@ -146,8 +237,15 @@ public class Carte extends SingleGraph {
         dij.clear() ;
         return chemin ;
     }
-//L'ordre est : duree | dureeEstimé | Distance
-    public  ArrayList<ArrayList<Integer>> dijkstraInfos(CentreSante origine) {
+
+    /**
+     * Réalise une analyse complète des chemins depuis un centre d'origine vers tous les autres centres.
+     * L'ordre des données dans les listes renvoyées est : [0] = Durée, [1] = Durée Estimée, [2] = Distance.
+     *
+     * @param origine Le {@link CentreSante} servant de point de départ pour l'algorithme.
+     * @return Une liste de listes d'entiers contenant les différentes métriques de trajet pour chaque sommet.
+     */
+    public ArrayList<ArrayList<Integer>> dijkstraInfos(CentreSante origine) {
         ArrayList<ArrayList<Integer>> chemin = new  ArrayList<>() ;
         for (Edge edge : this.getEdgeSet()) {
             double d = ((Route) edge).getDuree();
@@ -184,6 +282,14 @@ public class Carte extends SingleGraph {
         return dij ;
     }
 
+    /**
+     * Méthode utilitaire générant un graphe (secteur) de manière totalement aléatoire.
+     * Crée les centres et attribue des connexions avec des statistiques procédurales.
+     *
+     * @param nomGraph  L'identifiant textuel du graphe généré.
+     * @param nbSommets Le nombre total de centres de santé à créer.
+     * @return Une nouvelle instance de {@link Carte} configurée aléatoirement.
+     */
     public static Carte construireGrapheAleatoire(String nomGraph, int nbSommets){
         Carte graph = new Carte(nomGraph);
 
@@ -227,6 +333,14 @@ public class Carte extends SingleGraph {
         return graph ;
     }
 
+    /**
+     * Scanne, parse et importe un fichier CSV pour construire un secteur complet (sommets et arêtes).
+     *
+     * @param id     L'identifiant textuel du graphe à créer.
+     * @param chemin Le chemin du fichier CSV sur le disque.
+     * @return Une instance de {@link Carte} représentant les données du fichier.
+     * @throws FileNotFoundException Si le fichier pointé par le chemin est introuvable.
+     */
     public static Carte Parsing(String id, String chemin) throws FileNotFoundException{
         Carte carte = new Carte(id);
         ArrayList<ArrayList<String>> recordsCSV = new ArrayList<>();
@@ -282,6 +396,9 @@ public class Carte extends SingleGraph {
         return carte;
     }
 
+    /**
+     * Active ou désactive l'affichage du nom pour l'ensemble des centres du graphe.
+     */
     public void switchAffNoms() {
         CentreSante c;
         for (Node n : this) {
@@ -290,6 +407,9 @@ public class Carte extends SingleGraph {
         }
     }
 
+    /**
+     * Active ou désactive l'affichage de l'identifiant pour l'ensemble des centres du graphe.
+     */
     public void switchAffIDs() {
         CentreSante c;
         for (Node n : this) {
@@ -298,6 +418,9 @@ public class Carte extends SingleGraph {
         }
     }
 
+    /**
+     * Active ou désactive l'affichage du type pour l'ensemble des centres du graphe.
+     */
     public void switchAffTypes() {
         CentreSante c;
         for (Node n : this) {
@@ -306,37 +429,57 @@ public class Carte extends SingleGraph {
         }
     }
 
+    /**
+     * Réinitialise la couleur et l'épaisseur de toutes les routes du graphe à leur état par défaut (noir).
+     * Respecte également l'état de visibilité actuel (masqué ou normal).
+     */
     public void resetCouleursRoutes() {
         String visibility = "";
         if (routesCachees) {
             visibility = " visibility-mode: hidden;";
         }
         for (Edge e : this.getEdgeSet()) {
-
             e.setAttribute("ui.style", "fill-color: black; size: 1;"+visibility);
         }
     }
 
+    /**
+     * Réinitialise la couleur et l'épaisseur d'une seule route spécifique à son état par défaut (noir).
+     *
+     * @param r La {@link Route} à réinitialiser.
+     */
     public void resetCouleurRoute(Route r) {
         String visibility = "";
         if (routesCachees) {
             visibility = " visibility-mode: hidden;";
         }
-        
         r.setAttribute("ui.style", "fill-color: black; size: 1;" + visibility);
     }
 
+    /**
+     * Applique une couleur et augmente l'épaisseur pour un ensemble de routes constituant un chemin.
+     * Force la visibilité à l'état normal pour mettre le chemin en évidence.
+     *
+     * @param chemin Le {@link Path} (ensemble de nœuds et d'arêtes) à mettre en valeur.
+     * @param color  La couleur cible ({@link Color}) à appliquer.
+     */
     public void colorerChemin(Path chemin, Color color) {
         String visibility = "";
         if (routesCachees) {
             visibility = " visibility-mode: normal;";
         }
         for (Edge e : chemin.getEdgeSet()) {
-
             e.setAttribute("ui.style", "fill-color: rgb("+color.getRed()+", "+color.getGreen()+", "+color.getBlue()+"); size: 3;"+visibility);
         }
     }
 
+    /**
+     * Met en évidence avec une couleur spécifique toutes les routes dont la fiabilité est 
+     * strictement inférieure à un seuil donné.
+     *
+     * @param seuil La note de fiabilité en dessous de laquelle la route est colorée.
+     * @param color La couleur cible ({@link Color}) à appliquer sur les routes dangereuses.
+     */
     public void colorerSeuil(double seuil, Color color) {
         for (Edge e : this.getEdgeSet()) {
             if (((Route)e).getFiabilite() < seuil) {
@@ -345,6 +488,10 @@ public class Carte extends SingleGraph {
         }
     }
 
+    /**
+     * Bascule la visibilité globale (cacher/montrer) pour toutes les routes qui ne sont pas 
+     * actuellement mises en valeur (qui n'ont pas une taille augmentée).
+     */
     public void switchCacherRoutes() {
         String oldParams;
         if (routesCachees) {
@@ -375,6 +522,9 @@ public class Carte extends SingleGraph {
         routesCachees = !routesCachees;
     }
 
+    /**
+     * Active ou désactive l'affichage textuel de la distance sur l'intégralité des routes du graphe.
+     */
     public void switchAffDistance() {
         Route r;
         for (Edge e : this.getEdgeSet()) {
@@ -383,6 +533,9 @@ public class Carte extends SingleGraph {
         }
     }
 
+    /**
+     * Active ou désactive l'affichage textuel de la durée sur l'intégralité des routes du graphe.
+     */
     public void switchAffDuree() {
         Route r;
         for (Edge e : this.getEdgeSet()) {
@@ -391,6 +544,9 @@ public class Carte extends SingleGraph {
         }
     }
 
+    /**
+     * Active ou désactive l'affichage textuel de la fiabilité sur l'intégralité des routes du graphe.
+     */
     public void switchAffFiabilite() {
         Route r;
         for (Edge e : this.getEdgeSet()) {
@@ -398,5 +554,4 @@ public class Carte extends SingleGraph {
             r.switchAffFiabilite();
         }
     }
-
 }

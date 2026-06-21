@@ -1,74 +1,78 @@
-// package Test;
+package Test;
 
-// import elements.*;
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
-// import static org.junit.jupiter.api.Assertions.*;
+import elements.Carte;
+import elements.CentreSante;
+import elements.Route;
+import org.junit.Before;
+import org.junit.Test;
 
-// public class CarteTest {
+import static org.junit.Assert.*;
 
-//     private Carte carte;
+public class CarteTest {
 
-//     @BeforeEach
-//     public void setUp() {
-//         carte = new Carte("TestMap");
-//     }
+    private Carte carte;
 
-//     @Test
-//     public void testAjouterCentreEtCompteurs() {
-//         carte.ajouterCentre("Hopital Central", 'O');
-//         carte.ajouterCentre("Clinique Sud", 'M');
-//         carte.ajouterCentre("Dispensaire Est", 'N');
-//         carte.ajouterCentre("Dispensaire Ouest", 'N');
+    @Before
+    public void setUp() {
+        carte = new Carte("TestGraph");
+    }
 
-//         assertEquals(1, carte.getNbBloc(), "Le nombre de blocs opératoires devrait être 1");
-//         assertEquals(1, carte.getNbMat(), "Le nombre de maternités devrait être 1");
-//         assertEquals(2, carte.getNbNutri(), "Le nombre de centres de nutrition devrait être 2");
-//         assertEquals(4, carte.getNbTotalCentres(), "Le nombre total de centres devrait être 4");
+    @Test
+    public void testAjoutCentresEtStatistiques() {
+        assertEquals("La carte devrait être vide au départ", 0, carte.getNbTotalCentres());
+
+        carte.ajouterCentre("S1", 'M');
+        carte.ajouterCentre("S2", 'O');
+        carte.ajouterCentre("S3", 'M');
+        carte.ajouterCentre("S4", 'N');
+
+        assertEquals("Il devrait y avoir 4 centres au total", 4, carte.getNbTotalCentres());
+        assertEquals("Le compteur de maternités est faux", 2, carte.getNbMat());
+        assertEquals("Le compteur de blocs opératoires est faux", 1, carte.getNbBloc());
+        assertEquals("Le compteur de centres de nutrition est faux", 1, carte.getNbNutri());
+    }
+
+    @Test
+    public void testAjoutEtRecuperationRoute() {
+        carte.ajouterCentre("S1", 'M');
+        carte.ajouterCentre("S2", 'O');
+
+        carte.ajouterRoute(0, 1, 5, 20, 30);
         
-//         CentreSante centre = carte.getCentre(0);
-//         assertNotNull(centre);
-//         assertEquals("Hopital Central", centre.getNomCentre());
-//         assertEquals('O', centre.getCenterType());
-//     }
-
-//     @Test
-//     public void testAjouterRouteEtRecuperation() {
-//         carte.ajouterCentre("Centre A", 'M');
-//         carte.ajouterCentre("Centre B", 'O');
+        Route route = carte.getRoute(0, 1);
+        assertNotNull("La route 0-1 devrait exister", route);
+        assertEquals("L'identifiant de la route généré par GraphStream est incorrect", "0-1", route.getId());
         
-//         carte.ajouterRoute(0, 1, 8, 50, 60);
+        Route routeInverse = carte.getRoute(1, 0);
+        assertNotNull("La méthode getRoute devrait trouver la route peu importe le sens des index", routeInverse);
+        assertEquals("Les deux recherches devraient renvoyer le même objet Route", route, routeInverse);
+    }
 
-//         Route route = carte.getRoute(0, 1);
-//         assertNotNull(route, "La route entre 0 et 1 devrait exister");
-//         assertEquals(8, route.getFiabilite());
-//         assertEquals(50, route.getDistance());
-//         assertEquals(60, route.getDuree());
+    @Test
+    public void testConstruireGrapheAleatoire() {
+        int nbSommetsVoulus = 10;
+        Carte carteAleatoire = Carte.construireGrapheAleatoire("Alea", nbSommetsVoulus);
+
+        assertEquals("Le nombre de sommets générés est incorrect", nbSommetsVoulus, carteAleatoire.getNbTotalCentres());
+        assertTrue("Le graphe aléatoire devrait contenir des routes", carteAleatoire.getEdgeCount() > 0);
+    }
+
+    @Test
+    public void testDijkstraDuree() {
+        carte.ajouterCentre("S1", 'M');
+        carte.ajouterCentre("S2", 'O');
+        carte.ajouterCentre("S3", 'N');
+
+        carte.ajouterRoute(0, 1, 10, 10, 15);
+        carte.ajouterRoute(1, 2, 10, 10, 15);
+        carte.ajouterRoute(0, 2, 10, 10, 50);
+
+        CentreSante depart = carte.getCentre("1");
+        CentreSante arrivee = carte.getCentre("3");
+
+        org.graphstream.graph.Path chemin = carte.dijkstraDuree(depart, arrivee);
         
-//         // La route doit être récupérable peu importe l'ordre des IDs passés en paramètre
-//         Route routeInverse = carte.getRoute(1, 0);
-//         assertNotNull(routeInverse, "La route entre 1 et 0 devrait exister (graphe non orienté)");
-//         assertEquals(route, routeInverse);
-//     }
-
-//     @Test
-//     public void testRouteCalculeDureeEstimee() {
-//         carte.ajouterCentre("Centre A", 'M');
-//         carte.ajouterCentre("Centre B", 'O');
-        
-//         // duree = 60, fiabilite = 8
-//         carte.ajouterRoute(0, 1, 8, 50, 60);
-//         Route route = carte.getRoute(0, 1);
-
-//         // calcul attendu : 60 * (20 - 8) / 10 = 60 * 12 / 10 = 72
-//         assertEquals(72, route.calculeDureeEstimee(), "La durée estimée calculée est incorrecte");
-//     }
-
-//     @Test
-//     public void testConstruireGrapheAleatoire() {
-//         Carte randomGraph = Carte.construireGrapheAleatoire("RandomMap", 10);
-//         assertNotNull(randomGraph);
-//         assertEquals("RandomMap", randomGraph.getId());
-//         assertEquals(10, randomGraph.getNbTotalCentres(), "Le graphe devrait contenir 10 centres");
-//     }
-// }
+        assertNotNull("Un chemin devrait être trouvé", chemin);
+        assertEquals("Le chemin le plus rapide devrait passer par S2 (2 arêtes)", 2, chemin.getEdgeCount());
+    }
+}

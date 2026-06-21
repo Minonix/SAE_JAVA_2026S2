@@ -20,6 +20,13 @@ import java.util.Iterator;
 
 import javax.swing.*;
 
+/**
+ * Fenêtre principale de l'application (héritant de {@link JFrame}).
+ * Cette classe agit comme le chef d'orchestre de l'interface graphique. 
+ * Elle intègre le rendu visuel de la carte (via GraphStream), les panneaux d'informations,
+ * les menus de filtrage et d'affichage, ainsi que les outils permettant de calculer 
+ * des itinéraires (Dijkstra) ou de générer des tournées de camions.
+ */
 public class MainWindow extends JFrame {
     // vue principale
     MyPanel pnlInfoBox, pnlInfoBoxSec, pnlSelectTrajet, pnlMap, pnlStatistique, pnlBoxBtnTourne, pnlFiltre;
@@ -34,6 +41,12 @@ public class MainWindow extends JFrame {
 
     ArrayList<Carte> secteurs;
 
+    /**
+     * Constructeur de la fenêtre principale de l'application.
+     * Initialise la taille de la fenêtre, charge les cartes par défaut (ou un fichier CSV existant),
+     * génère tous les composants de l'interface (menus, panneaux, boutons) et met en place 
+     * les écouteurs d'événements pour les interactions utilisateur.
+     */
     public MainWindow() {
         super("NOM");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

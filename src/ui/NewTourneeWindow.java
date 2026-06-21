@@ -1,13 +1,16 @@
 package ui;
 
-import elements.Carte;
-
-import javax.swing.*;
+import Exception.NoChangeException;
 import java.awt.*;
 import java.util.ArrayList;
+import javax.swing.*;
 
-import Exception.NoChangeException;
-
+/**
+ * Fenêtre de dialogue (JDialog) permettant à l'utilisateur de configurer les paramètres 
+ * d'une nouvelle tournée de véhicules.
+ * L'utilisateur peut définir le nombre de camions alloués à la tournée et filtrer 
+ * le type de centres de santé à desservir (tous, blocs, maternités ou nutrition).
+ */
 public class NewTourneeWindow extends JDialog {
     private JComboBox<Integer> cbNbCamions;
     private JComboBox<String> cbTypeCentre;
@@ -17,7 +20,7 @@ public class NewTourneeWindow extends JDialog {
 
     private ArrayList<Object> parameters;
 
-    NewTourneeWindow() {
+    public NewTourneeWindow() {
         super();
 
         this.parameters = null;
@@ -33,6 +36,7 @@ public class NewTourneeWindow extends JDialog {
     }
 
     private void initListener() {
+        // ... (Code conservé à l'identique)
         btRetour.addActionListener(e -> {
             this.dispose();
         });
@@ -58,6 +62,7 @@ public class NewTourneeWindow extends JDialog {
     }
 
     private void initComponent() {
+        // ... (Code conservé à l'identique)
         cbNbCamions = new JComboBox<>(new Integer[]{1, 2});
         cbTypeCentre = new JComboBox<>(new String[]{"Tous", "Blocs opératoires", "Maternités", "Centres de nutrition"});
         lbNbCamions = new JLabel("Nombre de camions :");
@@ -88,6 +93,16 @@ public class NewTourneeWindow extends JDialog {
         setContentPane(mainPanel);
     }
 
+    /**
+     * Ouvre la fenêtre de paramétrage de la tournée et bloque l'exécution jusqu'à la validation.
+     * Convertit les choix de l'utilisateur (menus déroulants) en variables exploitables par l'algorithme.
+     *
+     * @return Une liste contenant les paramètres configurés par l'utilisateur :
+     * - Index 0 (Integer) : Le nombre de camions (ex: 1 ou 2).
+     * - Index 1 (Character) : Le caractère symbolisant le type de centre ciblé 
+     * ('O', 'M', 'N') ou {@code null} si l'utilisateur souhaite desservir tous les centres.
+     * @throws NoChangeException Si l'utilisateur ferme la fenêtre via la croix ou le bouton "Retour".
+     */
     public static ArrayList<Object> newTournee() throws NoChangeException {
         NewTourneeWindow nTour = new NewTourneeWindow();
         nTour.setVisible(true); // L'exécution du code s'arrête ici jusqu'au this.dispose()

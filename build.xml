@@ -1,68 +1,95 @@
 <project name="SAE_JAVA_2026S2" default="compile" basedir=".">
-    
-    <property name="project.name" value="SAE_JAVA_2026S2"/>
-    <property name="java.version" value="26"/>
-    <property name="debug.port" value="5005"/>
-    <property name="debug.timeout" value="0"/> <condition property="isWindows">
-        <os family="windows"/>
+
+    <property name="project.name" value="SAE_JAVA_2026S2" />
+    <property name="java.version" value="26" />
+    <property name="debug.port" value="5005" />
+    <property name="debug.timeout" value="0" />
+
+    <condition property="isWindows">
+        <os family="windows" />
     </condition>
-    
-    <property name="src.dir" value="src"/>
-    <property name="build.dir" value="build"/>
-    <property name="dist.dir" value="dist"/>
-    <property name="lib.dir" value="lib"/>
-    <property name="dist.lib.dir" value="${dist.dir}/lib"/>
+
+    <property name="src.dir" value="src" />
+    <property name="build.dir" value="build" />
+    <property name="dist.dir" value="dist" />
+    <property name="lib.dir" value="lib" />
+    <property name="dist.lib.dir" value="${dist.dir}/lib" />
+    <property name="report.dir" value="reports" />
 
     <path id="project.classpath">
         <fileset dir="${lib.dir}">
-            <include name="*.jar"/>
+            <include name="*.jar" />
         </fileset>
     </path>
 
     <path id="dist.classpath">
         <fileset dir="${dist.lib.dir}">
-            <include name="*.jar"/>
+            <include name="*.jar" />
         </fileset>
     </path>
 
     <target name="clean">
-        <echo>Nettoyage des répertoires build et dist...</echo>
-        <delete dir="${build.dir}" quiet="true" failonerror="false"/>
-        <delete dir="${dist.dir}" quiet="true" failonerror="false"/>
+        <echo>Nettoyage des répertoires build, dist et reports...</echo>
+        <delete dir="${build.dir}" quiet="true" failonerror="false" />
+        <delete dir="${dist.dir}" quiet="true" failonerror="false" />
+        <delete dir="${report.dir}" quiet="true" failonerror="false" />
         <echo>Nettoyage terminé.</echo>
     </target>
 
     <target name="init" depends="clean">
         <echo>Initialisation des répertoires...</echo>
-        <mkdir dir="${build.dir}"/>
-        <mkdir dir="${dist.dir}"/>
-        <mkdir dir="${dist.lib.dir}"/>
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${dist.dir}" />
+        <mkdir dir="${dist.lib.dir}" />
         <echo>Répertoires créés : ${build.dir}, ${dist.dir}, ${dist.lib.dir}</echo>
     </target>
 
     <target name="compile" depends="init">
         <echo>Compilation des sources depuis ${src.dir} vers ${build.dir}...</echo>
-        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" debuglevel="source,lines,vars" failonerror="false">
-            <classpath refid="project.classpath"/>
+        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true"
+            debuglevel="source,lines,vars" failonerror="false">
+            <classpath refid="project.classpath" />
         </javac>
         <echo>Compilation terminée.</echo>
+    </target>
+
+    <target name="test" depends="compile" description="Lance un test spécifique (ant test -Dtest=Classe) ou tout (ant test)">
+        <mkdir dir="${report.dir}"/>
+        
+        <condition property="test.target" value="Test.${test}" else="Test.*Test">
+            <isset property="test"/>
+        </condition>
+
+        <junit printsummary="yes" haltonfailure="no" fork="true">
+            <classpath>
+                <path refid="project.classpath"/>
+                <pathelement location="${build.dir}"/>
+            </classpath>
+            <formatter type="plain" usefile="false"/>
+            
+            <batchtest todir="${report.dir}">
+                <fileset dir="${build.dir}">
+                    <include name="${test.target}.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
     </target>
 
     <target name="jar" depends="compile">
         <echo>Création du JAR...</echo>
         <copy todir="${dist.lib.dir}" overwrite="true">
             <fileset dir="${lib.dir}">
-                <include name="*.jar"/>
+                <include name="*.jar" />
             </fileset>
         </copy>
         <echo>Dépendances copiées vers ${dist.lib.dir}</echo>
         <manifestclasspath property="jar.classpath" jarfile="${dist.dir}/${project.name}.jar">
-            <classpath refid="dist.classpath"/>
+            <classpath refid="dist.classpath" />
         </manifestclasspath>
         <jar destfile="${dist.dir}/${project.name}.jar" basedir="${build.dir}">
             <manifest>
-                <attribute name="Main-Class" value="Main"/>
-                <attribute name="Class-Path" value="${jar.classpath}"/>
+                <attribute name="Main-Class" value="Main" />
+                <attribute name="Class-Path" value="${jar.classpath}" />
             </manifest>
         </jar>
         <echo>JAR créé : ${dist.dir}/${project.name}.jar</echo>
@@ -70,23 +97,24 @@
 
     <target name="run" depends="jar">
         <echo>Lancement de l'application...</echo>
-        <java jar="${dist.dir}/${project.name}.jar" fork="true"/>
+        <java jar="${dist.dir}/${project.name}.jar" fork="true" />
         <echo>Application lancée.</echo>
     </target>
 
     <target name="kill-port-windows" if="isWindows">
         <echo>Libération du port ${debug.port} en cours (Windows)...</echo>
         <exec executable="cmd" failonerror="false">
-            <arg value="/c"/>
-            <arg value="for /f &quot;tokens=5&quot; %a in ('netstat -a -n -o ^| findstr :${debug.port}') do taskkill /F /PID %a"/>
+            <arg value="/c" />
+            <arg
+                value="for /f &quot;tokens=5&quot; %a in ('netstat -a -n -o ^| findstr :${debug.port}') do taskkill /F /PID %a" />
         </exec>
     </target>
 
     <target name="kill-port-unix" unless="isWindows">
         <echo>Libération du port ${debug.port} en cours (Unix)...</echo>
         <exec executable="sh" failonerror="false">
-            <arg value="-c"/>
-            <arg value="lsof -t -i:${debug.port} | xargs kill -9"/>
+            <arg value="-c" />
+            <arg value="lsof -t -i:${debug.port} | xargs kill -9" />
         </exec>
     </target>
 
@@ -98,16 +126,41 @@
         <echo>Port de débogage : ${debug.port}</echo>
         <echo>Classpath : ${jar.classpath}</echo>
         <echo></echo>
-        <echo>⚠️  IMPORTANT :</echo>
+        <echo>⚠️ IMPORTANT :</echo>
         <echo>1. Connectez VS Code à localhost:${debug.port}</echo>
         <echo>2. Ouvrez Run > Debug et sélectionnez 'Debug SAE_JAVA_2026S2'</echo>
         <echo>3. La JVM attend la connexion du débogueur...</echo>
         <echo></echo>
         <java jar="${dist.dir}/${project.name}.jar" fork="true" failonerror="false">
-            <jvmarg value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=${debug.port}"/>
+            <jvmarg
+                value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=${debug.port}" />
         </java>
         <echo></echo>
         <echo>Mode débogage terminé.</echo>
     </target>
 
+    <target name="javadoc" description="Génère la documentation Javadoc au format HTML">
+        <echo>Génération du site HTML de la Javadoc dans le dossier 'docs'...</echo>
+
+        <delete dir="docs" quiet="true" failonerror="false" />
+        <mkdir dir="docs" />
+
+        <javadoc sourcepath="${src.dir}"
+            destdir="docs"
+            charset="UTF-8"
+            docencoding="UTF-8"
+            encoding="UTF-8"
+            private="true"
+            author="true"
+            version="true"
+            windowtitle="Documentation SAE Java">
+
+            <classpath refid="project.classpath" />
+        </javadoc>
+
+        <echo>============================================</echo>
+        <echo>Javadoc générée avec succès !</echo>
+        <echo>Allez dans le dossier 'docs' et double-cliquez sur 'index.html' pour voir le site.</echo>
+        <echo>============================================</echo>
+    </target>
 </project>
