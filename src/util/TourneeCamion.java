@@ -11,10 +11,14 @@ public class TourneeCamion {
     public static ArrayList<CentreSante> tourneeGlouton(Carte carte){
         ArrayList<CentreSante> solution = new ArrayList<>();
 
-        boolean flagLivre = false ;
+        boolean flagLivre ;
 
         CentreSante centreCourant = carte.getCentre(0);
-
+        solution.add(centreCourant);
+        flagLivre = true;
+        for (Node n : carte.getNodeSet()) {
+            flagLivre = flagLivre && solution.contains((CentreSante)n);
+        }
         while (!flagLivre) {
             ArrayList<ArrayList<Integer>> infoD = carte.dijkstraInfos(centreCourant);
 
@@ -46,7 +50,7 @@ public class TourneeCamion {
         ArrayList<CentreSante> pass = new ArrayList<>() ;
         ArrayList<CentreSante> solution = new ArrayList<>();
         CentreSante centreCourant ;
-        boolean flagLivre = false ;
+        boolean flagLivre ;
 
         for (Node n : carte.getNodeSet() ){
             if (((CentreSante)n).getCenterType() != type) {
@@ -112,11 +116,18 @@ public class TourneeCamion {
         ArrayList<CentreSante> solutionC1 = new ArrayList<>();
         ArrayList<CentreSante> solutionC2 = new ArrayList<>();
 
-        boolean flagLivre = false ;
+        boolean flagLivre ;
 
         CentreSante centreCourant1 = carte.getCentre(0);
         CentreSante centreCourant2 = carte.getCentre(0);
 
+        solutionC1.add(centreCourant1);
+        solutionC2.add(centreCourant1);
+
+        flagLivre = true;
+        for (Node n : carte.getNodeSet()) {
+            flagLivre = flagLivre && (solutionC1.contains((CentreSante) n) || solutionC2.contains((CentreSante) n));
+        }
         while (!flagLivre) {
 
             ArrayList<ArrayList<Integer>> infoD = carte.dijkstraInfos(centreCourant1);
