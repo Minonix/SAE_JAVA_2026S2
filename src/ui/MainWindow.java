@@ -232,7 +232,7 @@ public class MainWindow extends JFrame {
             depLab = new JLabel("Départ : ");
             arrLab = new JLabel("Arrivée : ");
             btnchercherDuree = new JButton("Le plus rapide");
-            btnchercherEstimation = new JButton("L'entre deux"); // TODO: a changé le nom
+            btnchercherEstimation = new JButton("Sûr et rapide");
             btRetourNormal = new JButton("Retour à la normal");
             cbDep = new JComboBox<>();
             cbArr = new JComboBox<>();

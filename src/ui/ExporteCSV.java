@@ -1,5 +1,6 @@
 package ui;
 
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import elements.Carte;
 import elements.CentreSante;
 import util.TourneeCamion;
 
+import javax.swing.*;
 import java.io.File;
 
 public class ExporteCSV {
@@ -46,8 +48,7 @@ public class ExporteCSV {
 
             writer.writeNext(ligne.toArray(new String[0]));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de l'export, avez-vous les droits sur le ficheier ?", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
     }
@@ -83,8 +84,7 @@ public class ExporteCSV {
 
             writer.writeNext(ligne.toArray(new String[0]));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de l'export, avez-vous les droits sur le ficheier ?", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
     }
