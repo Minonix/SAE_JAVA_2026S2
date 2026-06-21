@@ -19,7 +19,7 @@ public class ExporteCSV {
     public ExporteCSV() {
     }
 
-    public static void ExporteCSV1c(ArrayList<CentreSante> list, Carte carte, String nom) {
+    public static void ExporteCSV1c(ArrayList<CentreSante> listeOpti, Integer dureeGlouton, Carte carte, String nom) {
 
         File file = new File("resultats1camionEquipe2Groupe4.csv");
 
@@ -39,10 +39,10 @@ public class ExporteCSV {
             ArrayList<String> ligne = new ArrayList<>();
 
             ligne.add(nom);
-            ligne.add(String.valueOf(TourneeCamion.getDuree(carte, list)));
-            ligne.add("x");
+            ligne.add(dureeGlouton.toString());
+            ligne.add(String.valueOf(TourneeCamion.getDuree(carte, listeOpti)));
 
-            for (CentreSante centre : list) {
+            for (CentreSante centre : listeOpti) {
                 ligne.add(String.valueOf(centre.getIdCentre()));
             }
 
