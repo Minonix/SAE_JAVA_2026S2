@@ -480,14 +480,13 @@ public class MainWindow extends JFrame {
                     ArrayList<CentreSante>[] resultTournee;
 
                     if (params.getLast() != null)
-                        // TourneeCamion.tourneeGlouton2C(mapSelcetione,(Character) params.getLast());
-                        System.out.println("TO BE IMPLEMENTED");
-
-                    else {
+                        resultTournee = TourneeCamion.tourneeGlouton2C(mapSelcetione,(Character) params.getLast());
+                    else
                         resultTournee = TourneeCamion.tourneeGlouton2C(mapSelcetione);
-                        ExporteCSV.ExporteCSV2c(resultTournee, mapSelcetione, (String) cbSecteur.getSelectedItem());
-                    }
+
+                    ExporteCSV.ExporteCSV2c(resultTournee, mapSelcetione, (String) cbSecteur.getSelectedItem());
                 }
+                JOptionPane.showMessageDialog(this, "La tournée à bien été ajoutée, consultez votre répertoire courant.");
             } catch (NoChangeException ignored){}
         });
 
