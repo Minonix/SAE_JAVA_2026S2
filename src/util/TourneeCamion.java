@@ -289,7 +289,6 @@ public class TourneeCamion {
                     if (getDuree(carte, trajetTest) < tempsRef) {
                         meilleureTournee = trajetTest;
                         amelioration = true;
-                        System.out.println("i : " + i + "  | j : " + j);
                     }
                 }
             }
