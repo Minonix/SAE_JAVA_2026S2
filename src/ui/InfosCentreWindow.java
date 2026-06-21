@@ -155,8 +155,6 @@ public class InfosCentreWindow extends JFrame{
         }
     }
 
-    // TODO : Fusionner initTabDistance et initTabDuree en modulaire
-
     private void initTabDistance() {
         pnlDistance = new JPanel(new GridBagLayout());
 
@@ -189,7 +187,6 @@ public class InfosCentreWindow extends JFrame{
         JLabel tmpLabel;
 
         for (int i = 0; i < 3; i++) {
-            // TODO : ne marche pas pour le background, marche pour le texte ?
             tmpLabel = new JLabel("Durée aux " + typeCentres[i]);
             tmpLabel.setBackground(Color.ORANGE);
             pnlDuree.add(tmpLabel, gc);

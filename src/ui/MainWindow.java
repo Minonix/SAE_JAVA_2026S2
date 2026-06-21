@@ -290,7 +290,7 @@ public class MainWindow extends JFrame {
             depLab = new JLabel("Départ : ");
             arrLab = new JLabel("Arrivée : ");
             btnchercherDuree = new JButton("Le plus rapide");
-            btnchercherEstimation = new JButton("L'entre deux"); // TODO: a changé le nom
+            btnchercherEstimation = new JButton("Sûr et rapide");
             btRetourNormal = new JButton("Retour à la normal");
             cbDep = new JComboBox<>();
             cbArr = new JComboBox<>();
@@ -524,15 +524,21 @@ public class MainWindow extends JFrame {
             try {
                 ArrayList<Object> params = NewTourneeWindow.newTournee();
                 if ((Integer) params.getFirst() == 1) {
-                    ArrayList<CentreSante> resultTournee;
+                    ArrayList<CentreSante> resultOpti;
+                    ArrayList<CentreSante> resultGlouton;
+                    int dureeGlouton;
+                    if (params.getLast() != null) {
+                        resultGlouton = TourneeCamion.tourneeGlouton(mapSelcetione, (Character) params.getLast());
+                    }
+                    else{
+                        resultGlouton = TourneeCamion.tourneeGlouton(mapSelcetione);
+                    }
+                    resultOpti = TourneeCamion.optimisation2Opt(mapSelcetione, resultGlouton);
+                    dureeGlouton = TourneeCamion.getDuree(mapSelcetione, resultGlouton);
 
-                    if (params.getLast() != null)
-                        resultTournee = TourneeCamion.tourneeGlouton(mapSelcetione, (Character) params.getLast());
-                    else
-                        resultTournee = TourneeCamion.tourneeGlouton(mapSelcetione);
-
-                    ExporteCSV.ExporteCSV1c(resultTournee, mapSelcetione, (String) cbSecteur.getSelectedItem());
-                } else {
+                    ExporteCSV.ExporteCSV1c(resultOpti, dureeGlouton, mapSelcetione, (String) cbSecteur.getSelectedItem());
+                }
+                else {
                     ArrayList<CentreSante>[] resultTournee;
 
                     if (params.getLast() != null)

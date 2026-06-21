@@ -11,10 +11,14 @@ public class TourneeCamion {
     public static ArrayList<CentreSante> tourneeGlouton(Carte carte){
         ArrayList<CentreSante> solution = new ArrayList<>();
 
-        boolean flagLivre = false ;
+        boolean flagLivre ;
 
         CentreSante centreCourant = carte.getCentre(0);
-
+        solution.add(centreCourant);
+        flagLivre = true;
+        for (Node n : carte.getNodeSet()) {
+            flagLivre = flagLivre && solution.contains((CentreSante)n);
+        }
         while (!flagLivre) {
             ArrayList<ArrayList<Integer>> infoD = carte.dijkstraInfos(centreCourant);
 
@@ -46,7 +50,7 @@ public class TourneeCamion {
         ArrayList<CentreSante> pass = new ArrayList<>() ;
         ArrayList<CentreSante> solution = new ArrayList<>();
         CentreSante centreCourant ;
-        boolean flagLivre = false ;
+        boolean flagLivre ;
 
         for (Node n : carte.getNodeSet() ){
             if (((CentreSante)n).getCenterType() != type) {
@@ -59,7 +63,13 @@ public class TourneeCamion {
             centreCourant = carte.getCentre(id);
             id++ ;
         } while (centreCourant.getCenterType() != type);
+        solution.add(centreCourant);
+        pass.add(centreCourant);
 
+        flagLivre = true;
+        for (Node n : carte.getNodeSet()) {
+            flagLivre = flagLivre && pass.contains((CentreSante)n);
+        }
         while (!flagLivre) {
             ArrayList<ArrayList<Integer>> infoD = carte.dijkstraInfos(centreCourant);
 
@@ -106,11 +116,18 @@ public class TourneeCamion {
         ArrayList<CentreSante> solutionC1 = new ArrayList<>();
         ArrayList<CentreSante> solutionC2 = new ArrayList<>();
 
-        boolean flagLivre = false ;
+        boolean flagLivre ;
 
         CentreSante centreCourant1 = carte.getCentre(0);
         CentreSante centreCourant2 = carte.getCentre(0);
 
+        solutionC1.add(centreCourant1);
+        solutionC2.add(centreCourant1);
+
+        flagLivre = true;
+        for (Node n : carte.getNodeSet()) {
+            flagLivre = flagLivre && (solutionC1.contains((CentreSante) n) || solutionC2.contains((CentreSante) n));
+        }
         while (!flagLivre) {
 
             ArrayList<ArrayList<Integer>> infoD = carte.dijkstraInfos(centreCourant1);
@@ -173,7 +190,7 @@ public class TourneeCamion {
         ArrayList<CentreSante> solutionC1 = new ArrayList<>();
         ArrayList<CentreSante> solutionC2 = new ArrayList<>();
 
-        boolean flagLivre = false ;
+        boolean flagLivre ;
 
         for (Node n : carte.getNodeSet() ){
             if (((CentreSante)n).getCenterType() != type) {
@@ -190,15 +207,22 @@ public class TourneeCamion {
             centreCourant2 = carte.getCentre(id);
             id++ ;
         } while (centreCourant1.getCenterType() != type);
+        solutionC1.add(centreCourant1);
+        solutionC2.add(centreCourant1);
+        pass.add(centreCourant1);
 
+
+        flagLivre = true;
+        for (Node n : carte.getNodeSet()) {
+            flagLivre = flagLivre && pass.contains((CentreSante)n);
+        }
         while (!flagLivre) {
-
             ArrayList<ArrayList<Integer>> infoD = carte.dijkstraInfos(centreCourant1);
 
             int min1 = -1;
             int imin1 = -1;
             for (int i = 0; i < infoD.size(); i++) {
-                if ((min1 > infoD.get(i).getFirst() || min1 == -1) && !pass.contains(carte.getCentre(i)) && !solutionC1.contains(carte.getCentre(i)) && !solutionC2.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()-1) {
+                if ((min1 > infoD.get(i).getFirst() || min1 == -1) && !pass.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()-1) {
                     min1 = infoD.get(i).getFirst();
                     imin1 = i;
                 }
@@ -221,7 +245,7 @@ public class TourneeCamion {
                 int min2 = -1;
                 int imin2 = -1;
                 for (int i = 0; i < infoD.size(); i++) {
-                    if ((min2 > infoD.get(i).get(0) || min2 == -1) && i != imin1 && !pass.contains(carte.getCentre(i)) && !solutionC1.contains(carte.getCentre(i)) && !solutionC2.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()) {
+                    if ((min2 > infoD.get(i).get(0) || min2 == -1) && i != imin1 && !pass.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()) {
                         min2 = infoD.get(i).get(0);
                         imin2 = i;
                     }
@@ -230,7 +254,7 @@ public class TourneeCamion {
                 Path mChemin2 = carte.dijkstraDuree(centreCourant2, carte.getCentre(imin2));
 
                 for (Node d : mChemin2.getNodeSet()) {
-                    if (!solutionC1.contains(d) && !solutionC2.contains(d) || ((CentreSante) d).getIdCentre()==1) {
+                    if (!solutionC1.contains(d) && !solutionC2.contains(d)) {
                         solutionC2.add((CentreSante) d);
                         pass.add((CentreSante) d);
                         centreCourant2 = (CentreSante) d;
@@ -265,7 +289,6 @@ public class TourneeCamion {
                     if (getDuree(carte, trajetTest) < tempsRef) {
                         meilleureTournee = trajetTest;
                         amelioration = true;
-                        System.out.println("i : " + i + "  | j : " + j);
                     }
                 }
             }

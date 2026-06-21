@@ -1,5 +1,6 @@
 package ui;
 
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,13 +11,14 @@ import elements.Carte;
 import elements.CentreSante;
 import util.TourneeCamion;
 
+import javax.swing.*;
 import java.io.File;
 
 public class ExporteCSV {
 
     public ExporteCSV() {}
 
-    public static void ExporteCSV1c(ArrayList<CentreSante> list, Carte carte, String nom) {
+    public static void ExporteCSV1c(ArrayList<CentreSante> listeOpti, Integer dureeGlouton, Carte carte, String nom) {
 
         File file = new File("resultats1camionEquipe2Groupe4.csv");
 
@@ -36,17 +38,16 @@ public class ExporteCSV {
             ArrayList<String> ligne = new ArrayList<>();
 
             ligne.add(nom);
-            ligne.add(String.valueOf(TourneeCamion.getDuree(carte, list)));
-            ligne.add("x");
+            ligne.add(dureeGlouton.toString());
+            ligne.add(String.valueOf(TourneeCamion.getDuree(carte, listeOpti)));
 
-            for (CentreSante centre : list) {
+            for (CentreSante centre : listeOpti) {
                 ligne.add(String.valueOf(centre.getIdCentre()));
             }
 
             writer.writeNext(ligne.toArray(new String[0]));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de l'export, avez-vous les droits sur le ficheier ?", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
     }
@@ -82,8 +83,7 @@ public class ExporteCSV {
 
             writer.writeNext(ligne.toArray(new String[0]));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de l'export, avez-vous les droits sur le ficheier ?", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
     }
