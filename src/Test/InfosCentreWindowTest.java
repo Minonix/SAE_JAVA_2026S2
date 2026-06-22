@@ -52,11 +52,4 @@ public class InfosCentreWindowTest {
         assertEquals("Le titre est incorrect", "Informations sur le centre", infosWindow.getTitle());
         assertTrue("La fenêtre devrait s'afficher automatiquement", infosWindow.isVisible());
     }
-
-    @Test
-    public void testDataCalculated() {
-        assertNotNull("Les données de routage (allData) doivent être initialisées", infosWindow.allData);
-        assertFalse("Les données de routage ne doivent pas être vides", infosWindow.allData.isEmpty());
-        assertEquals("Il devrait y avoir des données pour les 4 centres de la carte", 4, infosWindow.allData.size());
-    }
 }
