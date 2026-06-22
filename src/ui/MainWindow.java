@@ -437,7 +437,8 @@ public class MainWindow extends JFrame {
                     String idSommet = element.getId();
                     Object n = mapSelcetione.getCentre(idSommet);
                     if (SwingUtilities.isRightMouseButton(e)) {
-                        new InfosCentreWindow((CentreSante) n);
+                        InfosCentreWindow window = new InfosCentreWindow((CentreSante) n);
+                        window.setVisible(true);
                     } else {
                         initInfoBox(n);
                     }

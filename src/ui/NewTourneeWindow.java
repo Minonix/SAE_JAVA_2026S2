@@ -36,7 +36,6 @@ public class NewTourneeWindow extends JDialog {
     }
 
     private void initListener() {
-        // ... (Code conservé à l'identique)
         btRetour.addActionListener(e -> {
             this.dispose();
         });
@@ -44,25 +43,16 @@ public class NewTourneeWindow extends JDialog {
             parameters = new ArrayList<>();
             parameters.add(cbNbCamions.getSelectedItem());
             switch (cbTypeCentre.getSelectedIndex()) {
-                case 0:
-                    parameters.add(1, null);
-                    break;
-                case 1:
-                    parameters.add(1, 'O');
-                    break;
-                case 2:
-                    parameters.add(1, 'M');
-                    break;
-                case 3:
-                    parameters.add(1, 'N');
-                    break;
+                case 0 -> parameters.add(1, null);
+                case 1 -> parameters.add(1, 'O');
+                case 2 -> parameters.add(1, 'M');
+                case 3 -> parameters.add(1, 'N');
             }
             this.dispose();
         });
     }
 
     private void initComponent() {
-        // ... (Code conservé à l'identique)
         cbNbCamions = new JComboBox<>(new Integer[]{1, 2});
         cbTypeCentre = new JComboBox<>(new String[]{"Tous", "Blocs opératoires", "Maternités", "Centres de nutrition"});
         lbNbCamions = new JLabel("Nombre de camions :");

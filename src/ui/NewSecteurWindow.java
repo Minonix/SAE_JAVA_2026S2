@@ -47,7 +47,6 @@ public class NewSecteurWindow extends JDialog {
     }
 
     private void initComponent() {
-        // ... (Code conservé à l'identique)
         JPanel panelFormulaire = new JPanel(new GridBagLayout());
 
         JLabel lblNom = new JLabel("Nom du secteur :");
@@ -93,7 +92,6 @@ public class NewSecteurWindow extends JDialog {
     }
 
     private void initListener() {
-        // ... (Code conservé à l'identique)
         btRetour.addActionListener(e ->
                 NewSecteurWindow.this.dispose()
         );

@@ -93,9 +93,11 @@ public class Carte extends SingleGraph {
     public void ajouterCentre(String nomCentre, char centerType) {
         CentreSante cTmp = new CentreSante(this, (getNbTotalCentres() + 1) + "", nomCentre, getNbTotalCentres() + 1, centerType);
         super.addNodeCallback(cTmp);
-        if (centerType == 'O') nbBloc++;
-        else if (centerType == 'N') nbNutri++;
-        else nbMat++;
+        switch (centerType) {
+            case 'O' -> nbBloc++;
+            case 'N' -> nbNutri++;
+            default -> nbMat++;
+        }
     }
 
     /**
@@ -185,8 +187,8 @@ public class Carte extends SingleGraph {
     public Path dijkstraDuree(CentreSante origine, CentreSante destination) {
         Path chemin ;
         for (Edge edge : this.getEdgeSet()) {
-            if (edge instanceof Route) {
-                double d = ((Route) edge).getDuree();
+            if (edge instanceof Route route) {
+                double d = route.getDuree();
                 edge.setAttribute("duree", d);
             }
         }
