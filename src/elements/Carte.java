@@ -324,7 +324,7 @@ public class Carte extends SingleGraph {
             }
             for (int j=i; j< nbSommets; j++){
                 proba_existe = alea.nextInt(5);
-                if (proba_existe == 0 && j != routeForce){
+                if (proba_existe == 0 && j != routeForce && i!=j){
                     proba_fiabl = alea.nextInt(2, 9) ;
                     proba_dist = alea.nextInt(10,51) ;
                     proba_duree = alea.nextInt(10,121) ;
