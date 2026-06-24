@@ -15,17 +15,17 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
-import java.io.FileNotFoundException;
 import java.util.Iterator;
 
 import javax.swing.*;
 
 /**
  * Fenêtre principale de l'application (héritant de {@link JFrame}).
- * Cette classe agit comme le chef d'orchestre de l'interface graphique. 
- * Elle intègre le rendu visuel de la carte (via GraphStream), les panneaux d'informations,
- * les menus de filtrage et d'affichage, ainsi que les outils permettant de calculer 
- * des itinéraires (Dijkstra) ou de générer des tournées de camions.
+ * Cette classe agit comme le chef d'orchestre de l'interface graphique.
+ * Elle intègre le rendu visuel de la carte (via GraphStream), les panneaux
+ * d'informations, les menus de filtrage et d'affichage, ainsi que les outils
+ * permettant de calculer des itinéraires (Dijkstra) ou de générer des tournées
+ * de camions.
  */
 public class MainWindow extends JFrame {
     // vue principale
@@ -41,34 +41,16 @@ public class MainWindow extends JFrame {
 
     ArrayList<Carte> secteurs;
 
-    /**
-     * Constructeur de la fenêtre principale de l'application.
-     * Initialise la taille de la fenêtre, charge les cartes par défaut (ou un fichier CSV existant),
-     * génère tous les composants de l'interface (menus, panneaux, boutons) et met en place 
-     * les écouteurs d'événements pour les interactions utilisateur.
-     */
     public MainWindow() {
-        super("NOM");
+        super("MediCeler");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setPreferredSize(new Dimension(1920, 1080));
         this.setMinimumSize(new Dimension(800, 600));
 
-        Carte map = new Carte("5");
-        map.ajouterCentre("S1", 'C');
-        map.ajouterCentre("S2", 'M');
-        map.ajouterRoute(0, 1, 8, 12, 87);
-
-        Carte map2;
-        try {
-            map2 = Carte.Parsing("Bonjour", "data/graphe2.csv");
-        } catch (FileNotFoundException e) {
-            System.err.println("Fichier introuvable : data/graphe2.csv");
-            map2 = new Carte("Bonjour"); // On crée une carte vide en secours pour éviter un crash
-        }
-
         secteurs = new ArrayList<>();
-        secteurs.add(map2);
-        secteurs.add(map);
+        try {
+            secteurs.add(NewSecteurWindow.NewSecteur());
+        } catch (NoChangeException e) {}
 
         initComponent();
         initMenu();
@@ -77,6 +59,34 @@ public class MainWindow extends JFrame {
         this.setLocationRelativeTo(null);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
+    }
+
+    public MainWindow(ArrayList<Carte> secteurs) {
+        super("MediCeler");
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setPreferredSize(new Dimension(1920, 1080));
+        this.setMinimumSize(new Dimension(800, 600));
+
+        this.secteurs = secteurs != null ? secteurs : new ArrayList<>();
+
+        initComponent();
+        initMenu();
+        initListener();
+
+        this.setLocationRelativeTo(null);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setVisible(true);
+    }
+
+    private Carte getSecteurCourant() {
+        if (secteurs.isEmpty()) {
+            return null;
+        }
+        int index = cbSecteur.getSelectedIndex();
+        if (index >= 0 && index < secteurs.size()) {
+            return secteurs.get(index);
+        }
+        return null;
     }
 
     private void initMenu() {
@@ -129,17 +139,21 @@ public class MainWindow extends JFrame {
         gc.gridy = 0;
         gc.gridheight = 1;
         gc.weighty = 0.2;
-        this.getContentPane().add(initFiltre(), gc);
+        this.getContentPane().add(initFiltre(), gc); // Initialise cbSecteur
+
+        Carte mapSelectionne = getSecteurCourant();
 
         gc.gridy = 1;
         gc.gridheight = 2;
         gc.weighty = 0.3;
-        this.getContentPane().add(initInfoBox(secteurs.get(cbSecteur.getSelectedIndex()).getRoute(0, 1)), gc);
+        Route routeInitiale = (mapSelectionne != null && mapSelectionne.getEdgeCount() > 0) ? mapSelectionne.getRoute(0, 1)
+                : null;
+        this.getContentPane().add(initInfoBox(routeInitiale), gc);
 
         gc.gridy = 3;
         gc.gridheight = 2;
         gc.weighty = 0.3;
-        this.getContentPane().add(initSelectTrajet(secteurs.get(cbSecteur.getSelectedIndex())), gc);
+        this.getContentPane().add(initSelectTrajet(mapSelectionne), gc);
 
         gc.gridy = 5;
         gc.gridheight = 1;
@@ -153,13 +167,13 @@ public class MainWindow extends JFrame {
         gc.gridheight = 5;
         gc.gridwidth = 1;
         gc.weighty = 0.9;
-        this.getContentPane().add(initMap(secteurs.get(cbSecteur.getSelectedIndex())), gc);
+        this.getContentPane().add(initMap(mapSelectionne), gc);
 
         gc.fill = GridBagConstraints.VERTICAL;
         gc.gridy = 5;
         gc.gridheight = 1;
         gc.weighty = 0.1;
-        this.getContentPane().add(initStatistique(secteurs.get(cbSecteur.getSelectedIndex())), gc);
+        this.getContentPane().add(initStatistique(mapSelectionne), gc);
 
         this.getContentPane().setBackground(Color.WHITE);
         this.pack();
@@ -239,7 +253,7 @@ public class MainWindow extends JFrame {
             pnlInfoBox.add(sousPanel, gc);
 
         } else {
-            titreInfoBox = new JLabel("Aucun élément Sélectionner");
+            titreInfoBox = new JLabel("Aucun élément sélectionné");
             pnlInfoBox.add(titreInfoBox, gc);
         }
 
@@ -250,7 +264,7 @@ public class MainWindow extends JFrame {
 
     private MyPanel initInfoBoxSec(Route route) {
         if (pnlInfoBoxSec == null) {
-            pnlInfoBoxSec = new MyPanel(50, new Color(0xededef)); // TODO: trouver une sous couleur
+            pnlInfoBoxSec = new MyPanel(50, new Color(0xededef));
             pnlInfoBoxSec.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
             pnlInfoBoxSec.setLayout(new GridBagLayout());
@@ -304,7 +318,7 @@ public class MainWindow extends JFrame {
             arrLab = new JLabel("Arrivée : ");
             btnchercherDuree = new JButton("Le plus rapide");
             btnchercherEstimation = new JButton("Sûr et rapide");
-            btRetourNormal = new JButton("Retour à la normal");
+            btRetourNormal = new JButton("Retour à la normale");
             cbDep = new JComboBox<>();
             cbArr = new JComboBox<>();
 
@@ -330,9 +344,25 @@ public class MainWindow extends JFrame {
 
         cbDep.removeAllItems();
         cbArr.removeAllItems();
-        for (int i = 0; i < carte.getNbTotalCentres(); i++) {
-            cbDep.addItem(carte.getCentre(i).getNomCentre());
-            cbArr.addItem(carte.getCentre(i).getNomCentre());
+
+        if (carte != null) {
+            for (int i = 0; i < carte.getNbTotalCentres(); i++) {
+                cbDep.addItem(carte.getCentre(i).getNomCentre());
+                cbArr.addItem(carte.getCentre(i).getNomCentre());
+            }
+            btnchercherDuree.setEnabled(true);
+            btnchercherEstimation.setEnabled(true);
+            btRetourNormal.setEnabled(true);
+            cbDep.setEnabled(true);
+            cbArr.setEnabled(true);
+        } else {
+            cbDep.addItem("Aucun");
+            cbArr.addItem("Aucun");
+            btnchercherDuree.setEnabled(false);
+            btnchercherEstimation.setEnabled(false);
+            btRetourNormal.setEnabled(false);
+            cbDep.setEnabled(false);
+            cbArr.setEnabled(false);
         }
 
         return pnlSelectTrajet;
@@ -351,7 +381,7 @@ public class MainWindow extends JFrame {
 
             lbSeuil = new JLabel("Seuil (unité entre 1 et 10) : ");
             lbChxSecteur = new JLabel("Secteur : ");
-            txSeuil = new JTextField(6);
+            txSeuil = new JTextField("5", 6);
             cbSecteur = new JComboBox<>();
             btSeuil = new JButton("Valider");
 
@@ -380,22 +410,25 @@ public class MainWindow extends JFrame {
         }
         cbSecteur.addItem("+ Ajouter un Secteur");
 
+        btSeuil.setEnabled(!secteurs.isEmpty());
+        txSeuil.setEnabled(!secteurs.isEmpty());
+
         return pnlFiltre;
     }
 
     JButton btTourne;
 
     private MyPanel initBoxBtnTourne() {
-        pnlBoxBtnTourne = new MyPanel(0, new Color(0xededed));
-        pnlBoxBtnTourne.setLayout(new BorderLayout());
-        pnlBoxBtnTourne.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        if (pnlBoxBtnTourne == null) {
+            pnlBoxBtnTourne = new MyPanel(0, new Color(0xededed));
+            pnlBoxBtnTourne.setLayout(new BorderLayout());
+            pnlBoxBtnTourne.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
-        // pnlBoxBtnTourne.setPreferredSize(new Dimension(30, 50));
+            btTourne = new JButton("Créer une Tournée");
+            pnlBoxBtnTourne.add(btTourne, BorderLayout.CENTER);
+        }
 
-        btTourne = new JButton("Créer une Tournée");
-
-        pnlBoxBtnTourne.add(btTourne, BorderLayout.CENTER);
-
+        btTourne.setEnabled(!secteurs.isEmpty());
         return pnlBoxBtnTourne;
     }
 
@@ -410,46 +443,52 @@ public class MainWindow extends JFrame {
             }
         }
 
-        vwrCarte = new Viewer(map, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+        if (map != null) {
+            vwrCarte = new Viewer(map, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+            vwrCarte.enableAutoLayout();
+            Component view = vwrCarte.addDefaultView(false);
 
-        vwrCarte.enableAutoLayout();
+            vwrCarte.getDefaultView().setMouseManager(new DefaultMouseManager() {
+                public void mouseDragged(MouseEvent e) {
+                }
 
-        Component view = vwrCarte.addDefaultView(false);
+                public void mouseReleased(MouseEvent e) {
+                    super.mouseReleased(e);
 
-        vwrCarte.getDefaultView().setMouseManager(new DefaultMouseManager() {
+                    Carte mapSelectionne = getSecteurCourant();
+                    if (mapSelectionne == null)
+                        return;
 
-            public void mouseDragged(MouseEvent e) {
-            }
+                    GraphicsConfiguration gc = vwrCarte.getDefaultView().getGraphicsConfiguration();
+                    AffineTransform tx = gc.getDefaultTransform();
 
-            public void mouseReleased(MouseEvent e) {
-                super.mouseReleased(e);
+                    float x = (float) (e.getX() * tx.getScaleX());
+                    float y = (float) (e.getY() * tx.getScaleY());
 
-                Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-                GraphicsConfiguration gc = vwrCarte.getDefaultView().getGraphicsConfiguration();
-                AffineTransform tx = gc.getDefaultTransform();
+                    GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x, y);
 
-                float x = (float) (e.getX() * tx.getScaleX());
-                float y = (float) (e.getY() * tx.getScaleY());
-
-                GraphicElement element = vwrCarte.getDefaultView().findNodeOrSpriteAt(x, y);
-
-                if (element != null) {
-                    String idSommet = element.getId();
-                    Object n = mapSelcetione.getCentre(idSommet);
-                    if (SwingUtilities.isRightMouseButton(e)) {
-                        InfosCentreWindow window = new InfosCentreWindow((CentreSante) n);
-                        window.setVisible(true);
-                    } else {
-                        initInfoBox(n);
+                    if (element != null) {
+                        String idSommet = element.getId();
+                        Object n = mapSelectionne.getCentre(idSommet);
+                        if (SwingUtilities.isRightMouseButton(e)) {
+                            InfosCentreWindow window = new InfosCentreWindow((CentreSante) n);
+                            window.setVisible(true);
+                        } else {
+                            initInfoBox(n);
+                        }
                     }
                 }
-            }
-        });
+            });
+            pnlMap.add(view, BorderLayout.CENTER);
+        } else {
+            JLabel emptyLabel = new JLabel("Aucune carte chargée. Veuillez ajouter un secteur.", SwingConstants.CENTER);
+            emptyLabel.setFont(new Font("Arial", Font.BOLD, 18));
+            emptyLabel.setForeground(Color.GRAY);
+            pnlMap.add(emptyLabel, BorderLayout.CENTER);
+        }
 
-        pnlMap.add(view, BorderLayout.CENTER);
         pnlMap.revalidate();
         pnlMap.repaint();
-
         return pnlMap;
     }
 
@@ -459,7 +498,6 @@ public class MainWindow extends JFrame {
         if (pnlStatistique == null) {
             pnlStatistique = new MyPanel(0, Color.white);
             pnlStatistique.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-
             pnlStatistique.setLayout(new GridBagLayout());
 
             lbNbCentre = new JLabel();
@@ -478,9 +516,13 @@ public class MainWindow extends JFrame {
             pnlStatistique.add(lbNbOperatoire, gc);
         }
 
-        lbNbCentre.setText("Centres de Nutrition : " + map.getNbNutri());
-        lbNbMaternitee.setText("Maternités : " + map.getNbMat());
-        lbNbOperatoire.setText("Blocs Opératoires : " + map.getNbBloc());
+        if (map != null) {
+            lbNbCentre.setText("Centres de Nutrition : " + map.getNbNutri());
+            lbNbMaternitee.setText("Maternités : " + map.getNbMat());
+            lbNbOperatoire.setText("Blocs Opératoires : " + map.getNbBloc());
+        } else {
+            lbNbMaternitee.setText("Aucun Secteur sélectionné");
+        }
 
         lbNbCentre.setForeground(Color.green);
         lbNbMaternitee.setForeground(Color.blue);
@@ -491,101 +533,129 @@ public class MainWindow extends JFrame {
 
     private void initListener() {
         cbSecteur.addActionListener((e) -> {
-            if (((JComboBox) e.getSource()).getSelectedIndex() == ((JComboBox) e.getSource()).getItemCount() - 1) {
+            int selectedIndex = cbSecteur.getSelectedIndex();
+            if (selectedIndex == cbSecteur.getItemCount() - 1) {
                 Carte nCarte;
                 try {
                     nCarte = NewSecteurWindow.NewSecteur();
                 } catch (NoChangeException e1) {
+                    if (!secteurs.isEmpty()) {
+                        cbSecteur.setSelectedIndex(secteurs.size() - 1);
+                    }
                     return;
                 }
+
                 if (nCarte != null) {
                     secteurs.add(nCarte);
                     cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
-
+                    cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
                 }
-                cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
             }
-            Carte mapSelectionnee = secteurs.get(cbSecteur.getSelectedIndex());
+
+            Carte mapSelectionnee = getSecteurCourant();
             initMap(mapSelectionnee);
             initStatistique(mapSelectionnee);
-
             initInfoBox(null);
             initSelectTrajet(mapSelectionnee);
+
+            boolean hasMap = (mapSelectionnee != null);
+            btSeuil.setEnabled(hasMap);
+            txSeuil.setEnabled(hasMap);
+            if (btTourne != null) 
+                btTourne.setEnabled(hasMap);
         });
 
         btnchercherDuree.addActionListener((e) -> {
-            Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-            mapSelcetione.resetCouleursRoutes();
-            mapSelcetione.colorerChemin(mapSelcetione.dijkstraDuree(mapSelcetione.getCentre(cbDep.getSelectedIndex()),
-                    mapSelcetione.getCentre(cbArr.getSelectedIndex())), Color.BLUE);
+            Carte mapSelectionne = getSecteurCourant();
+            if (mapSelectionne == null)
+                return;
+
+            mapSelectionne.resetCouleursRoutes();
+            mapSelectionne.colorerChemin(
+                    mapSelectionne.dijkstraDuree(
+                            mapSelectionne.getCentre(cbDep.getSelectedIndex()),
+                            mapSelectionne.getCentre(cbArr.getSelectedIndex())),
+                    Color.BLUE);
         });
 
         btnchercherEstimation.addActionListener((e) -> {
-            Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-            mapSelcetione.resetCouleursRoutes();
-            mapSelcetione
-                    .colorerChemin(mapSelcetione.dijkstraEstimation(mapSelcetione.getCentre(cbDep.getSelectedIndex()),
-                            mapSelcetione.getCentre(cbArr.getSelectedIndex())), Color.GREEN);
+            Carte mapSelectionne = getSecteurCourant();
+            if (mapSelectionne == null)
+                return;
+
+            mapSelectionne.resetCouleursRoutes();
+            mapSelectionne.colorerChemin(
+                    mapSelectionne.dijkstraEstimation(
+                            mapSelectionne.getCentre(cbDep.getSelectedIndex()),
+                            mapSelectionne.getCentre(cbArr.getSelectedIndex())),
+                    Color.GREEN);
         });
 
         btRetourNormal.addActionListener((e) -> {
-            Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
-            mapSelcetione.resetCouleursRoutes();
+            Carte mapSelectionne = getSecteurCourant();
+            if (mapSelectionne == null)
+                return;
+
+            mapSelectionne.resetCouleursRoutes();
         });
 
         btTourne.addActionListener((e) -> {
-            Carte mapSelcetione = secteurs.get(cbSecteur.getSelectedIndex());
+            Carte mapSelectionne = getSecteurCourant();
+            if (mapSelectionne == null)
+                return;
+
             try {
                 ArrayList<Object> params = NewTourneeWindow.newTournee();
                 if ((Integer) params.getFirst() == 1) {
-                    ArrayList<CentreSante> resultOpti;
                     ArrayList<CentreSante> resultGlouton;
-                    int dureeGlouton;
                     if (params.getLast() != null) {
-                        resultGlouton = TourneeCamion.tourneeGlouton(mapSelcetione, (Character) params.getLast());
+                        resultGlouton = TourneeCamion.tourneeGlouton(mapSelectionne, (Character) params.getLast());
+                    } else {
+                        resultGlouton = TourneeCamion.tourneeGlouton(mapSelectionne);
                     }
-                    else{
-                        resultGlouton = TourneeCamion.tourneeGlouton(mapSelcetione);
-                    }
-                    resultOpti = TourneeCamion.optimisation2Opt(mapSelcetione, resultGlouton);
-                    dureeGlouton = TourneeCamion.getDuree(mapSelcetione, resultGlouton);
+                    ArrayList<CentreSante> resultOpti = TourneeCamion.optimisation2Opt(mapSelectionne, resultGlouton);
+                    int dureeGlouton = TourneeCamion.getDuree(mapSelectionne, resultGlouton);
 
-                    ExporteCSV.ExporteCSV1c(resultOpti, dureeGlouton, mapSelcetione, (String) cbSecteur.getSelectedItem());
-                }
-                else {
+                    ExporteCSV.ExporteCSV1c(resultOpti, dureeGlouton, mapSelectionne,
+                            (String) cbSecteur.getSelectedItem());
+                } else {
                     ArrayList<CentreSante>[] resultTournee;
-
-                    if (params.getLast() != null)
-                        resultTournee = TourneeCamion.tourneeGlouton2C(mapSelcetione, (Character) params.getLast());
-                    else
-                        resultTournee = TourneeCamion.tourneeGlouton2C(mapSelcetione);
-
-                    ExporteCSV.ExporteCSV2c(resultTournee, mapSelcetione, (String) cbSecteur.getSelectedItem());
+                    if (params.getLast() != null) {
+                        resultTournee = TourneeCamion.tourneeGlouton2C(mapSelectionne, (Character) params.getLast());
+                    } else {
+                        resultTournee = TourneeCamion.tourneeGlouton2C(mapSelectionne);
+                    }
+                    ExporteCSV.ExporteCSV2c(resultTournee, mapSelectionne, (String) cbSecteur.getSelectedItem());
                 }
                 JOptionPane.showMessageDialog(this,
-                        "La tournée à bien été ajoutée, consultez votre répertoire courant.");
+                        "La tournée a bien été ajoutée, consultez votre répertoire courant.");
             } catch (NoChangeException ignored) {
             }
         });
 
         btSeuil.addActionListener((e) -> {
-            int seuil = 0;
-            secteurs.get(cbSecteur.getSelectedIndex()).resetCouleursRoutes();
+            Carte mapSelectionne = getSecteurCourant();
+            if (mapSelectionne == null)
+                return;
+
+            mapSelectionne.resetCouleursRoutes();
             try {
-                seuil = Integer.parseInt(txSeuil.getText());
+                int seuil = Integer.parseInt(txSeuil.getText());
                 if (seuil < 0 || seuil > 10)
                     throw new NumberFormatException();
+                mapSelectionne.colorerSeuil(seuil, Color.RED);
             } catch (NumberFormatException err) {
-                JOptionPane.showMessageDialog(this,
-                        "Entrée du seuil invalide", "Erreur",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Entrée du seuil invalide (doit être un nombre entre 0 et 10)",
+                        "Erreur", JOptionPane.ERROR_MESSAGE);
             }
-            secteurs.get(cbSecteur.getSelectedIndex()).colorerSeuil(seuil, Color.RED);
         });
 
         cbRoutes.addActionListener(e -> {
+            Carte mapSelectionnee = getSecteurCourant();
+            if (mapSelectionnee == null)
+                return;
+
             int indexSelectionne = cbRoutes.getSelectedIndex();
-            Carte mapSelectionnee = secteurs.get(cbSecteur.getSelectedIndex());
 
             if (routeMiseEnEvidence != null) {
                 mapSelectionnee.resetCouleurRoute(routeMiseEnEvidence);
@@ -603,9 +673,8 @@ public class MainWindow extends JFrame {
         });
 
         miNouveau.addActionListener(e -> {
-            Carte nCarte;
             try {
-                nCarte = NewSecteurWindow.NewSecteur();
+                Carte nCarte = NewSecteurWindow.NewSecteur();
                 secteurs.add(nCarte);
                 cbSecteur.insertItemAt(nCarte.toString(), cbSecteur.getItemCount() - 1);
                 cbSecteur.setSelectedIndex(cbSecteur.getItemCount() - 2);
@@ -614,45 +683,32 @@ public class MainWindow extends JFrame {
         });
 
         mixAfficherId.addActionListener(e -> {
-            for (Carte secteur : secteurs) {
-                secteur.switchAffIDs();
-            }
+            for (Carte s : secteurs)
+                s.switchAffIDs();
         });
-
         mixAfficherNom.addActionListener(e -> {
-            for (Carte secteur : secteurs) {
-                secteur.switchAffNoms();
-            }
+            for (Carte s : secteurs)
+                s.switchAffNoms();
         });
-
         mixAfficherType.addActionListener(e -> {
-            for (Carte secteur : secteurs) {
-                secteur.switchAffTypes();
-            }
+            for (Carte s : secteurs)
+                s.switchAffTypes();
         });
-
         mixCacherRoutes.addActionListener(e -> {
-            for (Carte secteur : secteurs) {
-                secteur.switchCacherRoutes();
-            }
+            for (Carte s : secteurs)
+                s.switchCacherRoutes();
         });
-
         mixAfficherDistance.addActionListener(e -> {
-            for (Carte secteur : secteurs) {
-                secteur.switchAffDistance();
-            }
+            for (Carte s : secteurs)
+                s.switchAffDistance();
         });
-
         mixAfficherDuree.addActionListener(e -> {
-            for (Carte secteur : secteurs) {
-                secteur.switchAffDuree();
-            }
+            for (Carte s : secteurs)
+                s.switchAffDuree();
         });
-
         mixAfficherFiabilite.addActionListener(e -> {
-            for (Carte secteur : secteurs) {
-                secteur.switchAffFiabilite();
-            }
+            for (Carte s : secteurs)
+                s.switchAffFiabilite();
         });
     }
 }
