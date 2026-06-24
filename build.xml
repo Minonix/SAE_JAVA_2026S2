@@ -139,7 +139,7 @@
         <echo>Mode débogage terminé.</echo>
     </target>
 
-    <target name="  " description="Génère la documentation Javadoc au format HTML">
+    <target name="docs" description="Génère la documentation Javadoc au format HTML">
         <echo>Génération du site HTML de la Javadoc dans le dossier 'docs'...</echo>
 
         <delete dir="docs" quiet="true" failonerror="false" />
