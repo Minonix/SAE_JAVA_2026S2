@@ -595,7 +595,13 @@ public class MainWindow extends JFrame {
                     } else {
                         resultGlouton = TourneeCamion.tourneeGlouton(mapSelectionne);
                     }
-                    ArrayList<CentreSante> resultOpti = TourneeCamion.optimisation2Opt(mapSelectionne, resultGlouton);
+                    ArrayList<CentreSante> resultOpti;
+                    if (mapSelectionne.getNbTotalCentres() < 30) {
+                        resultOpti = TourneeCamion.optimisation2Opt(mapSelectionne, resultGlouton);
+                    }
+                    else {
+                        resultOpti = resultGlouton;
+                    }
                     int dureeGlouton = TourneeCamion.getDuree(mapSelectionne, resultGlouton);
 
                     ExporteCSV.ExporteCSV1c(resultOpti, dureeGlouton, mapSelectionne,
