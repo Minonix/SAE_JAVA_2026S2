@@ -53,27 +53,27 @@
         <echo>Compilation terminée.</echo>
     </target>
 
-    <target name="test" depends="compile" description="Lance un test spécifique (ant test -Dtest=Classe) ou tout (ant test)">
-        <mkdir dir="${report.dir}"/>
-        
-        <condition property="test.target" value="Test.${test}" else="Test.*Test">
-            <isset property="test"/>
-        </condition>
+    <target name="test" depends="compile" description="Lance un test spécifique (ant test -Dtest=Classe) ou RunAllTests par défaut">
+    <mkdir dir="${report.dir}"/>
+    
+    <condition property="test.target" value="Test/${test}.class" else="Test/RunAllTests.class">
+        <isset property="test"/>
+    </condition>
 
-        <junit printsummary="yes" haltonfailure="no" fork="true">
-            <classpath>
-                <path refid="project.classpath"/>
-                <pathelement location="${build.dir}"/>
-            </classpath>
-            <formatter type="plain" usefile="false"/>
-            
-            <batchtest todir="${report.dir}">
-                <fileset dir="${build.dir}">
-                    <include name="${test.target}.class"/>
-                </fileset>
-            </batchtest>
-        </junit>
-    </target>
+    <junit printsummary="yes" haltonfailure="no" fork="true">
+        <classpath>
+            <path refid="project.classpath"/>
+            <pathelement location="${build.dir}"/>
+        </classpath>
+        
+        <formatter type="plain" usefile="true"/>
+        <formatter type="brief" usefile="false"/> <batchtest todir="${report.dir}">
+            <fileset dir="${build.dir}">
+                <include name="${test.target}"/>
+            </fileset>
+        </batchtest>
+    </junit>
+</target>
 
     <target name="jar" depends="compile">
         <echo>Création du JAR...</echo>
