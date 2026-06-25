@@ -596,6 +596,9 @@ public class MainWindow extends JFrame {
                         resultGlouton = TourneeCamion.tourneeGlouton(mapSelectionne);
                     }
                     ArrayList<CentreSante> resultOpti;
+
+                    // Malheureusement, l'algo opti est très lent et à partir de 30 sommets il fait crasher java
+                    // On remplace donc l'opti par un duplicat du glouton
                     if (mapSelectionne.getNbTotalCentres() < 30) {
                         resultOpti = TourneeCamion.optimisation2Opt(mapSelectionne, resultGlouton);
                     }
