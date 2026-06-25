@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Random;
+import javax.swing.JOptionPane;
 
 /**
  * Gère l'intégralité du réseau de santé (le graphe) pour un secteur donné.
@@ -322,6 +323,7 @@ public class Carte extends SingleGraph {
      */
     public static Carte Parsing(String id, String chemin) throws FileNotFoundException{
         Carte carte = new Carte(id);
+        int nbErrorRoute = 0;
         ArrayList<ArrayList<String>> recordsCSV = new ArrayList<>();
 
         CSVParser parser = new CSVParserBuilder().withSeparator(';').build();
@@ -358,19 +360,26 @@ public class Carte extends SingleGraph {
                                 
                                 carte.ajouterRoute(i, y - 2, proba, distance, duree);
                             } catch (NumberFormatException e) {
-                                System.err.println("Erreur de parsing numérique à la ligne " + i + ", colonne " + y + " : " + e.getMessage());
+                               nbErrorRoute++;
                             } 
                         }
                     }
                 }
             }
+            if (nbErrorRoute != 0) {
+                JOptionPane.showMessageDialog(null, nbErrorRoute + " erreur(s) dans la récupération des routes, elle(s) a(ont) été remplacer par une(des) route(s) null",
+                        "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
         } catch (IOException e) {
-            System.err.println("Erreur de lecture du fichier : " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erreur de lecture du fichier : " + e.getMessage(),
+                        "Erreur", JOptionPane.ERROR_MESSAGE);
             throw new FileNotFoundException();
         } catch (CsvValidationException e) {
-            System.err.println("Erreur de validation CSV : " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erreur de validation CSV : " + e.getMessage(),
+                        "Erreur", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            System.err.println("Erreur critique inattendue : " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erreur critique inattendue : " + e.getMessage(),
+                        "Erreur", JOptionPane.ERROR_MESSAGE);
         }
         return carte;
     }
