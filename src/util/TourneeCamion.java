@@ -186,8 +186,8 @@ public class TourneeCamion {
                 int min2 = -1;
                 int imin2 = -1;
                 for (int i = 0; i < infoD.size(); i++) {
-                    if ((min2 > infoD.get(i).get(0) || min2 == -1) && i != imin1 && !solutionC1.contains(carte.getCentre(i)) && !solutionC2.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()) {
-                        min2 = infoD.get(i).get(0);
+                    if ((min2 > infoD.get(i).getFirst() || min2 == -1) && i != imin1 && !solutionC1.contains(carte.getCentre(i)) && !solutionC2.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()) {
+                        min2 = infoD.get(i).getFirst();
                         imin2 = i;
                     }
                 }
@@ -195,7 +195,7 @@ public class TourneeCamion {
                 Path mChemin2 = carte.dijkstraDuree(centreCourant2, carte.getCentre(imin2));
 
                 for (Node d : mChemin2.getNodeSet()) {
-                    if (!solutionC1.contains(d) && !solutionC2.contains(d)) {
+                    if (!solutionC1.contains((CentreSante) d) && !solutionC2.contains((CentreSante) d)) {
                         solutionC2.add((CentreSante) d);
                         centreCourant2 = (CentreSante) d;
                     }
@@ -276,8 +276,8 @@ public class TourneeCamion {
                 int min2 = -1;
                 int imin2 = -1;
                 for (int i = 0; i < infoD.size(); i++) {
-                    if ((min2 > infoD.get(i).get(0) || min2 == -1) && i != imin1 && !pass.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()) {
-                        min2 = infoD.get(i).get(0);
+                    if ((min2 > infoD.get(i).getFirst() || min2 == -1) && i != imin1 && !pass.contains(carte.getCentre(i)) && i != centreCourant1.getIdCentre()) {
+                        min2 = infoD.get(i).getFirst();
                         imin2 = i;
                     }
                 }
@@ -285,7 +285,7 @@ public class TourneeCamion {
                 Path mChemin2 = carte.dijkstraDuree(centreCourant2, carte.getCentre(imin2));
 
                 for (Node d : mChemin2.getNodeSet()) {
-                    if (!solutionC1.contains(d) && !solutionC2.contains(d)) {
+                    if (!solutionC1.contains((CentreSante) d) && !solutionC2.contains((CentreSante) d)) {
                         solutionC2.add((CentreSante) d);
                         pass.add((CentreSante) d);
                         centreCourant2 = (CentreSante) d;

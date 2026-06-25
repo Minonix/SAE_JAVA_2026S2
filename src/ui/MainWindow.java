@@ -50,24 +50,7 @@ public class MainWindow extends JFrame {
         secteurs = new ArrayList<>();
         try {
             secteurs.add(NewSecteurWindow.NewSecteur());
-        } catch (NoChangeException e) {}
-
-        initComponent();
-        initMenu();
-        initListener();
-
-        this.setLocationRelativeTo(null);
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        this.setVisible(true);
-    }
-
-    public MainWindow(ArrayList<Carte> secteurs) {
-        super("MediCeler");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(1920, 1080));
-        this.setMinimumSize(new Dimension(800, 600));
-
-        this.secteurs = secteurs != null ? secteurs : new ArrayList<>();
+        } catch (NoChangeException ignored) {}
 
         initComponent();
         initMenu();
@@ -273,8 +256,7 @@ public class MainWindow extends JFrame {
         }
 
         GridBagConstraints gc = new GridBagConstraints();
-        Insets inset = new Insets(10, 20, 0, 20);
-        gc.insets = inset;
+        gc.insets = new Insets(10, 20, 0, 20);
         gc.gridx = 0;
         gc.gridy = 0;
 

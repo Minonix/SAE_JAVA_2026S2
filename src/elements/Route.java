@@ -11,7 +11,8 @@ import org.graphstream.graph.implementations.AbstractEdge;
 public class Route extends AbstractEdge {
     private final int fiabilite, distance, duree;
     private String affFiabilite, affDistance, affDuree;
-    private CentreSante source, target;
+    private final CentreSante source;
+    private final CentreSante target;
 
     protected Route(String id, CentreSante source, CentreSante target, int fiabilite, int distance, int duree) {
         super(id, source, target, false);

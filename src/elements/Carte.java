@@ -199,25 +199,6 @@ public class Carte extends SingleGraph {
     }
 
     /**
-     * Calcule le plus court chemin entre deux centres en se basant sur la distance géographique.
-     *
-     * @param origine     Le {@link CentreSante} de départ.
-     * @param destination Le {@link CentreSante} d'arrivée.
-     * @return Le chemin optimal ({@link Path}) minimisant la distance.
-     */
-    public Path dijkstraDistance(CentreSante origine, CentreSante destination) {
-        Path chemin ;
-        for (Edge edge : this.getEdgeSet()) {
-            double d = ((Route) edge).getDistance();
-            edge.setAttribute("distance", d);
-        }
-        Dijkstra dij = dijkstra(origine, "distance");
-        chemin = dij.getPath(destination) ;
-        dij.clear() ;
-        return chemin ;
-    }
-
-    /**
      * Calcule le plus court chemin entre deux centres en se basant sur la durée de parcours estimée
      * (durée pondérée par la fiabilité de la route). Ne prend en compte que les routes ayant
      * une fiabilité minimale de 0.25.

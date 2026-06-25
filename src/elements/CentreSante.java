@@ -11,8 +11,8 @@ import org.graphstream.graph.implementations.SingleNode;
  * La classe gère également les attributs visuels du nœud pour l'interface graphique.
  */
 public class CentreSante extends SingleNode {
-    private int idCentre;
-    private char centerType;
+    private final int idCentre;
+    private final char centerType;
     private final String nomCentre;
 
     private String affIdCentre;
