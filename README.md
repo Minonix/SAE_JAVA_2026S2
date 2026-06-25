@@ -1,7 +1,7 @@
 # SAE Java 2026 S2
 
 Ce projet Java est une application graphique développée avec Swing. Il peut être compilé, exécuté et testé via Apache Ant.
-> Note : la sélection des sommet avec le clique ne fonctionne pas sous linux.
+> Note : la sélection des sommets avec le clique ne fonctionne pas sous linux, malgré de nombreuses tentatives.
 
 ## Prérequis
 
@@ -89,7 +89,7 @@ ant docs
 ```
 
 > Note : la cible nommée vide dans le fichier Ant génère la documentation Javadoc dans le dossier `docs/`. Pour lire la documentation ouvrer le fichier `docs/index.html`.
-> Note : Ne prèter par attention au 100 warning.
+> Note : Ne prêtez par attention au 100 warning.
 
 ## Notes importantes
 
