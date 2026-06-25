@@ -132,11 +132,7 @@ public class Carte extends SingleGraph {
             method.invoke(nodeA, rTmp);
             method.invoke(nodeB, rTmp);
 
-        } catch (Exception e) {
-            System.err.println("Erreur de réflexion lors de l'ajout de la route : " + e.getMessage());
-        }
-
-        rTmp.setAttribute("duree", (double) duree);
+        } catch (Exception e) {}
     }
 
     /**
