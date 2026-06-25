@@ -367,7 +367,7 @@ public class Carte extends SingleGraph {
                 }
             }
             if (nbErrorRoute != 0) {
-                JOptionPane.showMessageDialog(null, nbErrorRoute + " erreur(s) dans la récupération des routes, elle(s) a(ont) été remplacer par une(des) route(s) null",
+                JOptionPane.showMessageDialog(null, nbErrorRoute + " erreur(s) dans la récupération des routes, elle(s) a(ont) été remplacée(s) par une(des) route(s) null",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         } catch (IOException e) {
